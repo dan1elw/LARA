@@ -35,6 +35,7 @@ env/
 data/*.db
 data/*.db-journal
 *.log
+data/*.json
 
 # Testing
 .pytest_cache/

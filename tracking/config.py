@@ -13,7 +13,7 @@ from .constants import DEFAULT_DB_PATH, DEFAULT_RADIUS_KM, DEFAULT_UPDATE_INTERV
 class Config:
     """Configuration manager for LARA application."""
     
-    def __init__(self, config_path: str = "config.yaml"):
+    def __init__(self, config_path: str = "tracking/config.yaml"):
         """
         Initialize configuration.
         
@@ -40,9 +40,9 @@ class Config:
         """Get default configuration."""
         return {
             'location': {
-                'latitude': 49.3508,
-                'longitude': 8.1364,
-                'name': 'Neustadt an der Weinstraße, Germany'
+                'latitude': 50.28004,
+                'longitude': 8.455377,
+                'name': 'Schmitten im Taunus, Germany'
             },
             'tracking': {
                 'radius_km': DEFAULT_RADIUS_KM,
