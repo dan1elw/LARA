@@ -31,42 +31,165 @@ class FlightCollector:
         self.update_interval = max(config.update_interval, MIN_UPDATE_INTERVAL)
         self.api_url = config.api_url
         self.api_timeout = config.api_timeout
+        self.api_credentials = config.api_credentials
         
         self.iteration_count = 0
         self.last_date = None
+        self.consecutive_empty_scans = 0
+        self.total_empty_scans = 0
+        self.rate_limit_count = 0
+        self.last_request_time = 0
+        self.auth_failed = False  # Track if auth failed
     
     def fetch_flights(self) -> List[list]:
         """
-        Fetch flights from OpenSky Network API.
+        Fetch flights from OpenSky Network API with authentication support.
         
         Returns:
-            List of state vectors from API
+            List of state vectors from API, or empty list if no data
         """
         # Get bounding box for API query
-        lamin, lomin, lamax, lomax = get_bounding_box(
-            self.home_lat, self.home_lon, self.radius_km
-        )
+        try:
+            lamin, lomin, lamax, lomax = get_bounding_box(
+                self.home_lat, self.home_lon, self.radius_km
+            )
+        except Exception as e:
+            print(f"⚠️  Error calculating bounding box: {e}")
+            return []
         
         url = f"{self.api_url}?lamin={lamin}&lomin={lomin}&lamax={lamax}&lomax={lomax}"
         
+        # Enforce minimum time between requests
+        current_time = time.time()
+        time_since_last = current_time - self.last_request_time
+        
+        if time_since_last < self.update_interval:
+            time.sleep(self.update_interval - time_since_last)
+        
         try:
-            response = requests.get(url, timeout=self.api_timeout)
+            # Use authentication if available and hasn't failed
+            if self.api_credentials and not self.auth_failed:
+                response = requests.get(url, auth=self.api_credentials, timeout=self.api_timeout)
+            else:
+                response = requests.get(url, timeout=self.api_timeout)
+            
+            self.last_request_time = time.time()
+            
+            # Handle authentication failure (401 error)
+            if response.status_code == 401:
+                if self.api_credentials:
+                    print(f"\n❌ Authentication failed (401 Unauthorized)")
+                    print(f"   Your OpenSky credentials are incorrect or invalid.")
+                    print(f"   Possible issues:")
+                    print(f"   1. Wrong username or password")
+                    print(f"   2. Account not verified (check your email)")
+                    print(f"   3. Account suspended or inactive")
+                    print(f"\n   Switching to anonymous mode for this session...")
+                    print(f"   Fix your credentials in config.yaml and restart\n")
+                    
+                    # Disable auth for rest of session
+                    self.auth_failed = True
+                    
+                    # Try again without auth
+                    response = requests.get(url, timeout=self.api_timeout)
+                    self.last_request_time = time.time()
+                else:
+                    print(f"❌ Unexpected 401 error without credentials")
+                    return []
+            
+            # Handle rate limiting (429 error)
+            if response.status_code == 429:
+                self.rate_limit_count += 1
+                
+                # Get retry-after header if available
+                retry_after = response.headers.get('Retry-After')
+                
+                if retry_after:
+                    try:
+                        wait_time = int(retry_after)
+                    except:
+                        wait_time = 60  # Default to 60 seconds
+                else:
+                    # Exponential backoff: 60s, 120s, 180s, etc.
+                    wait_time = min(60 * self.rate_limit_count, 300)  # Max 5 minutes
+                
+                print(f"⚠️  Rate limited by OpenSky Network (429)")
+                print(f"   This is hit #{self.rate_limit_count}")
+                print(f"   Waiting {wait_time} seconds before retrying...")
+                
+                if not self.api_credentials or self.auth_failed:
+                    print(f"   💡 Tip: Register a free account at opensky-network.org for better limits")
+                    print(f"   💡 Add credentials to config.yaml under api.username and api.password")
+                else:
+                    print(f"   💡 Tip: Increase update_interval in config.yaml")
+                
+                time.sleep(wait_time)
+                
+                # Try again after waiting
+                try:
+                    if self.api_credentials and not self.auth_failed:
+                        response = requests.get(url, auth=self.api_credentials, timeout=self.api_timeout)
+                    else:
+                        response = requests.get(url, timeout=self.api_timeout)
+                    
+                    self.last_request_time = time.time()
+                    
+                    if response.status_code == 429:
+                        print(f"   Still rate limited after waiting. Skipping this scan.")
+                        return []
+                except Exception as e:
+                    print(f"   Retry failed: {e}")
+                    return []
+            
+            # Raise for other HTTP errors
             response.raise_for_status()
+            
+            # Reset rate limit counter on success
+            self.rate_limit_count = 0
+            
             data = response.json()
             
-            if data and 'states' in data and data['states']:
-                return data['states']
+            # Handle different response structures
+            if not data:
+                return []
+            
+            if 'states' not in data:
+                return []
+            
+            states = data['states']
+            if states is None:
+                return []
+            
+            if not isinstance(states, list):
+                return []
+            
+            return states
+        
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 401:
+                # Already handled above
+                return []
+            elif e.response.status_code == 429:
+                # Already handled above
+                return []
             else:
+                print(f"❌ HTTP Error {e.response.status_code}: {e}")
                 return []
         
         except requests.exceptions.Timeout:
             print(f"⚠️  API request timeout after {self.api_timeout}s")
             return []
+        
         except requests.exceptions.RequestException as e:
             print(f"❌ Error fetching data: {e}")
             return []
+        
         except ValueError as e:
             print(f"❌ Error parsing API response: {e}")
+            return []
+        
+        except Exception as e:
+            print(f"❌ Unexpected error fetching flights: {e}")
             return []
     
     def process_flight(self, state: list, timestamp: str) -> Optional[Dict[str, Any]]:
@@ -81,6 +204,10 @@ class FlightCollector:
             Dictionary with flight info or None if invalid
         """
         try:
+            # Validate state vector
+            if not state or not isinstance(state, list):
+                return None
+            
             # Parse state vector
             state_data = parse_state_vector(state)
             
@@ -99,9 +226,12 @@ class FlightCollector:
                 return None
             
             # Get or create flight record
-            icao24 = state_data['icao24']
-            callsign = state_data['callsign'] or 'UNKNOWN'
-            origin_country = state_data['origin_country']
+            icao24 = state_data.get('icao24')
+            if not icao24:
+                return None
+            
+            callsign = state_data.get('callsign') or 'UNKNOWN'
+            origin_country = state_data.get('origin_country') or 'Unknown'
             
             flight_id = self.db.get_or_create_flight(
                 icao24, callsign, origin_country, timestamp
@@ -119,7 +249,6 @@ class FlightCollector:
             }
         
         except Exception as e:
-            print(f"⚠️  Error processing flight: {e}")
             return None
     
     def display_flight_info(self, flight_info: Dict[str, Any]):
@@ -129,19 +258,23 @@ class FlightCollector:
         Args:
             flight_info: Dictionary with flight data
         """
-        callsign = flight_info['callsign']
-        distance = flight_info['distance']
-        altitude = flight_info['altitude']
-        velocity = flight_info['velocity']
+        callsign = flight_info.get('callsign', 'UNKNOWN')
+        distance = flight_info.get('distance', 0)
+        altitude = flight_info.get('altitude')
+        velocity = flight_info.get('velocity')
         
         print(f"  ✈️  {callsign:8s} | {distance:5.1f} km | ", end="")
         
-        if altitude:
+        if altitude is not None:
             print(f"{altitude:6.0f} m | ", end="")
+        else:
+            print(f"{'N/A':>6s} m | ", end="")
         
-        if velocity:
+        if velocity is not None:
             from .constants import MS_TO_KMH
             print(f"{velocity * MS_TO_KMH:5.1f} km/h", end="")
+        else:
+            print(f"{'N/A':>5s} km/h", end="")
         
         print()
     
@@ -156,17 +289,37 @@ class FlightCollector:
         print(f"Radius:    {self.radius_km} km")
         print(f"Interval:  {self.update_interval}s")
         print(f"Database:  {self.config.db_path}")
+        
+        # Show authentication status
+        if self.api_credentials:
+            print(f"Auth:      Configured (user: {self.api_credentials[0]})")
+            print(f"           Testing credentials on first request...")
+        else:
+            print(f"Auth:      Anonymous (consider registering at opensky-network.org)")
+        
         print("=" * 70)
+        
+        # Warning if interval is too low for anonymous users
+        if self.update_interval < 15 and not self.api_credentials:
+            print("\n⚠️  WARNING: Update interval is below recommended 15 seconds for anonymous users")
+            print("   You may encounter rate limiting (HTTP 429 errors)")
+            print("   Options:")
+            print("   1. Set update_interval_seconds: 15 in config.yaml")
+            print("   2. Register free account at opensky-network.org and add credentials")
+            print("=" * 70)
     
     def print_statistics(self):
         """Print current database statistics."""
-        stats = self.db.get_statistics()
-        print(f"\n📊 Current Database Statistics:")
-        print(f"   Total flights tracked: {stats['total_flights']:,}")
-        print(f"   Unique aircraft: {stats['unique_aircraft']:,}")
-        print(f"   Total positions logged: {stats['total_positions']:,}")
-        if stats['first_observation']:
-            print(f"   Data collection started: {stats['first_observation']}")
+        try:
+            stats = self.db.get_statistics()
+            print(f"\n📊 Current Database Statistics:")
+            print(f"   Total flights tracked: {stats['total_flights']:,}")
+            print(f"   Unique aircraft: {stats['unique_aircraft']:,}")
+            print(f"   Total positions logged: {stats['total_positions']:,}")
+            if stats.get('first_observation'):
+                print(f"   Data collection started: {stats['first_observation']}")
+        except Exception as e:
+            print(f"⚠️  Could not retrieve statistics: {e}")
     
     def run_single_iteration(self) -> int:
         """
@@ -184,9 +337,23 @@ class FlightCollector:
         # Fetch flights from API
         flights = self.fetch_flights()
         
+        # Handle empty results gracefully
         if not flights:
-            print("No flights detected")
+            self.consecutive_empty_scans += 1
+            self.total_empty_scans += 1
+            
+            # Show different messages based on consecutive empty scans
+            if self.consecutive_empty_scans == 1:
+                print("No flights detected")
+            elif self.consecutive_empty_scans >= 2:
+                print(f"No flights detected ({self.consecutive_empty_scans} consecutive)")
+            
             return 0
+        
+        # Reset consecutive counter when we find flights
+        if self.consecutive_empty_scans > 0:
+            print(f"✨ Flights detected again after {self.consecutive_empty_scans} empty scans")
+            self.consecutive_empty_scans = 0
         
         # Process each flight
         detected_flights = []
@@ -194,6 +361,13 @@ class FlightCollector:
             flight_info = self.process_flight(state, timestamp)
             if flight_info:
                 detected_flights.append(flight_info)
+        
+        # Handle case where API returns flights but none in our radius
+        if not detected_flights:
+            self.consecutive_empty_scans += 1
+            self.total_empty_scans += 1
+            print("No flights within tracking radius")
+            return 0
         
         # Sort by distance (closest first)
         detected_flights.sort(key=lambda x: x['distance'])
@@ -207,7 +381,10 @@ class FlightCollector:
         # Update daily stats if date changed
         if self.last_date != current_date:
             if self.last_date:
-                self.db.update_daily_stats(self.last_date.isoformat())
+                try:
+                    self.db.update_daily_stats(self.last_date.isoformat())
+                except Exception as e:
+                    print(f"⚠️  Error updating daily stats: {e}")
             self.last_date = current_date
         
         return len(detected_flights)
@@ -225,20 +402,43 @@ class FlightCollector:
         
         try:
             while True:
-                self.run_single_iteration()
+                try:
+                    self.run_single_iteration()
+                except Exception as e:
+                    # Don't crash on single iteration errors
+                    print(f"\n⚠️  Error in iteration {self.iteration_count}: {e}")
+                    print("   Continuing with next scan...")
                 
                 # Show updated stats every 10 iterations
                 if self.iteration_count % 10 == 0:
-                    stats = self.db.get_statistics()
-                    print(f"\n📈 Stats: {stats['total_flights']:,} flights, "
-                          f"{stats['total_positions']:,} positions logged\n")
+                    try:
+                        stats = self.db.get_statistics()
+                        empty_rate = (self.total_empty_scans / self.iteration_count) * 100
+                        
+                        print(f"\n📈 Stats after {self.iteration_count} scans:")
+                        
+                        auth_mode = "Anonymous" if (not self.api_credentials or self.auth_failed) else "Authenticated"
+                        print(f"   Mode: {auth_mode}")
+                        
+                        print(f"   Flights: {stats['total_flights']:,} | "
+                              f"Positions: {stats['total_positions']:,} | "
+                              f"Empty scans: {empty_rate:.1f}%")
+                        
+                        if self.rate_limit_count > 0:
+                            print(f"   ⚠️  Rate limit hits: {self.rate_limit_count}")
+                        
+                        print()
+                    except Exception as e:
+                        print(f"⚠️  Could not display stats: {e}")
                 
                 time.sleep(self.update_interval)
         
         except KeyboardInterrupt:
             self._handle_shutdown()
         except Exception as e:
-            print(f"\n❌ Unexpected error: {e}")
+            print(f"\n❌ Fatal error: {e}")
+            import traceback
+            traceback.print_exc()
             self._handle_shutdown()
     
     def _handle_shutdown(self):
@@ -247,19 +447,39 @@ class FlightCollector:
         
         # Update final daily stats
         if self.last_date:
-            self.db.update_daily_stats(self.last_date.isoformat())
+            try:
+                self.db.update_daily_stats(self.last_date.isoformat())
+            except Exception as e:
+                print(f"⚠️  Error updating final stats: {e}")
         
         # Print final statistics
-        stats = self.db.get_statistics()
-        print(f"\n📊 Final Statistics:")
-        print(f"   Total flights tracked: {stats['total_flights']:,}")
-        print(f"   Unique aircraft: {stats['unique_aircraft']:,}")
-        print(f"   Total positions logged: {stats['total_positions']:,}")
-        
-        if stats['avg_altitude_m']:
-            print(f"   Average altitude: {stats['avg_altitude_m']:.0f} m")
-        
-        if stats['closest_approach_km']:
-            print(f"   Closest approach: {stats['closest_approach_km']:.2f} km")
-        
-        print(f"\n💾 Data saved to: {self.config.db_path}")
+        try:
+            stats = self.db.get_statistics()
+            print(f"\n📊 Final Statistics:")
+            print(f"   Total scans: {self.iteration_count:,}")
+            print(f"   Empty scans: {self.total_empty_scans:,} ({(self.total_empty_scans/max(self.iteration_count, 1)*100):.1f}%)")
+            
+            if self.rate_limit_count > 0:
+                print(f"   Rate limit hits: {self.rate_limit_count}")
+                if not self.api_credentials or self.auth_failed:
+                    print(f"   💡 Recommendation: Register at opensky-network.org for better limits")
+                else:
+                    print(f"   💡 Recommendation: Increase update_interval to 15s or higher")
+            
+            if self.auth_failed:
+                print(f"   ⚠️  Authentication failed - fix credentials in config.yaml")
+            
+            print(f"   Total flights tracked: {stats['total_flights']:,}")
+            print(f"   Unique aircraft: {stats['unique_aircraft']:,}")
+            print(f"   Total positions logged: {stats['total_positions']:,}")
+            
+            if stats.get('avg_altitude_m'):
+                print(f"   Average altitude: {stats['avg_altitude_m']:.0f} m")
+            
+            if stats.get('closest_approach_km'):
+                print(f"   Closest approach: {stats['closest_approach_km']:.2f} km")
+            
+            print(f"\n💾 Data saved to: {self.config.db_path}")
+        except Exception as e:
+            print(f"⚠️  Error displaying final statistics: {e}")
+            print(f"💾 Data saved to: {self.config.db_path}")
