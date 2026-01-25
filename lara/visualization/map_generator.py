@@ -65,9 +65,9 @@ class MapGenerator:
         
         # Add circle showing tracking radius
         folium.Circle(
-            radius=50000,  # 50km in meters
+            radius=25000,  # 25km in meters
             location=[self.center_lat, self.center_lon],
-            popup='Tracking Radius (50km)',
+            popup='Tracking Radius (25km)',
             color='crimson',
             fill=False,
             weight=2,
