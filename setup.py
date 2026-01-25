@@ -28,6 +28,7 @@ setup(
     install_requires=[
         "requests>=2.31.0",
         "pyyaml>=6.0",
+        "folium>=0.15.0",
     ],
     extras_require={
         "dev": [
