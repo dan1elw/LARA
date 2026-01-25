@@ -7,7 +7,7 @@ location:
 
 tracking:
   radius_km: 25
-  update_interval_seconds: 10
+  update_interval_seconds: 15
   
 database:
   path: "data/lara_flights_schmitten.db"
@@ -15,6 +15,8 @@ database:
 api:
   opensky_url: "https://opensky-network.org/api/states/all"
   timeout_seconds: 10
+  username: None  # put here your OpenSky username
+  password: None # and password
   
 logging:
   level: "INFO"
