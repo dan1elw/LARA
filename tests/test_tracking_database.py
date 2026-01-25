@@ -12,7 +12,7 @@ from datetime import datetime
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from tracking.database import FlightDatabase
+from lara.tracking.database import FlightDatabase
 
 
 @pytest.fixture

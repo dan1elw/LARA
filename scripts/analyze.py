@@ -19,8 +19,8 @@ import sqlite3
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from tracking import Config, FlightReader
-from tracking.utils import haversine_distance
+from lara.tracking import Config, FlightReader
+from lara.tracking.utils import haversine_distance
 
 
 class FlightAnalyzer:

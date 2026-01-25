@@ -6,7 +6,7 @@ location:
   name: "Schmitten im Taunus, Germany"
 
 tracking:
-  radius_km: 35
+  radius_km: 25
   update_interval_seconds: 10
   
 database:

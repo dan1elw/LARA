@@ -13,7 +13,7 @@ from .constants import DEFAULT_DB_PATH, DEFAULT_RADIUS_KM, DEFAULT_UPDATE_INTERV
 class Config:
     """Configuration manager for LARA application."""
     
-    def __init__(self, config_path: str = "tracking/config.yaml"):
+    def __init__(self, config_path: str = "lara/tracking/config.yaml"):
         """
         Initialize configuration.
         
