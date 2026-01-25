@@ -1,0 +1,21 @@
+# LARA Configuration File
+
+location:
+  latitude: 50.28004
+  longitude: 8.455377
+  name: "Schmitten im Taunus, Germany"
+
+tracking:
+  radius_km: 25
+  update_interval_seconds: 10
+  
+database:
+  path: "data/lara_flights_schmitten.db"
+  
+api:
+  opensky_url: "https://opensky-network.org/api/states/all"
+  timeout_seconds: 10
+  
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
