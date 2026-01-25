@@ -23,7 +23,7 @@ def full_db():
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     
-    # Create minimal schema
+    # Create COMPLETE schema matching tracking component
     cursor.execute('''
         CREATE TABLE flights (
             id INTEGER PRIMARY KEY,
@@ -31,8 +31,10 @@ def full_db():
             callsign TEXT,
             origin_country TEXT,
             first_seen TIMESTAMP,
+            last_seen TIMESTAMP,
             min_distance_km REAL,
-            max_altitude_m REAL
+            max_altitude_m REAL,
+            min_altitude_m REAL
         )
     ''')
     

@@ -25,7 +25,7 @@ def pattern_db():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     
-    # Create tables
+    # Create tables with COMPLETE schema
     cursor.execute('''
         CREATE TABLE flights (
             id INTEGER PRIMARY KEY,
@@ -112,3 +112,8 @@ class TestPatternMatcher:
         
         assert 'high_variation_routes' in variations
         assert 'count' in variations
+
+
+if __name__ == '__main__':
+    pytest.main([__file__, '-v'])
+

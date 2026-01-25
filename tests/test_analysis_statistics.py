@@ -24,14 +24,17 @@ def stats_db():
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     
-    # Create tables
+    # Create tables with COMPLETE schema
     cursor.execute('''
         CREATE TABLE flights (
             id INTEGER PRIMARY KEY,
             icao24 TEXT,
             callsign TEXT,
             first_seen TIMESTAMP,
-            min_distance_km REAL
+            last_seen TIMESTAMP,
+            min_distance_km REAL,
+            max_altitude_m REAL,
+            min_altitude_m REAL
         )
     ''')
     
@@ -47,9 +50,9 @@ def stats_db():
     # Insert test data with various altitudes and distances
     for i in range(20):
         cursor.execute('''
-            INSERT INTO flights (icao24, callsign, first_seen, min_distance_km)
-            VALUES (?, ?, datetime('now', ?), ?)
-        ''', (f'test{i}', f'TST{i}', f'-{i} hours', i * 2.0))
+            INSERT INTO flights (icao24, callsign, first_seen, last_seen, min_distance_km, max_altitude_m)
+            VALUES (?, ?, datetime('now', ?), datetime('now', ?), ?, ?)
+        ''', (f'test{i}', f'TST{i}', f'-{i} hours', f'-{i} hours', i * 2.0, 10000))
         flight_id = cursor.lastrowid
         
         # Add positions at different altitudes
@@ -140,3 +143,7 @@ class TestStatisticsEngine:
         result = engine.analyze_airlines()
         
         assert 'top_airlines' in result
+
+
+if __name__ == '__main__':
+    pytest.main([__file__, '-v'])
