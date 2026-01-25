@@ -241,4 +241,6 @@ Examples:
 
 
 if __name__ == "__main__":
+    # Visualize dashboard for testing
+    sys.argv = ['scripts/visualize.py', '--dashboard']
     main()
