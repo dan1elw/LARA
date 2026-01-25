@@ -74,7 +74,7 @@ def main():
     # Create output filename
     if not args.output:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        args.output = f"lara_analysis_{timestamp}.{args.format}"
+        args.output = f"data/lara_analysis_{timestamp}.{args.format}"
     
     # Create analyzer
     try:
