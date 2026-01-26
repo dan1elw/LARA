@@ -163,9 +163,7 @@ class FlightCollector:
         
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 401:
-                print(f"❌ Authentication failed (401)")
-                print(f"   Your OAuth2 credentials may be invalid")
-                print(f"   Check your credentials.json file")
+                print(f"❌ Authentication failed (401): Your OAuth2 credentials may be invalid, check your credentials.json file")
                 return []
             elif e.response.status_code == 429:
                 # Already handled above
@@ -257,22 +255,19 @@ class FlightCollector:
     
     def print_header(self):
         """Print collector header information."""
-        print("=" * 70)
+        print("\n" + "=" * 70)
         print("🛩️  LARA - Local Air Route Analysis")
-        print("📍 Data Collection Module")
         print("=" * 70)
-        print(f"Location:  {self.home_lat}°N, {self.home_lon}°E")
-        print(f"Name:      {self.config.location_name}")
-        print(f"Radius:    {self.radius_km} km")
-        print(f"Interval:  {self.update_interval}s")
-        print(f"Database:  {self.config.db_path}")
+        print(f"Location:   {self.home_lat}°N, {self.home_lon}°E, {self.config.location_name}")
+        print(f"Radius:     {self.radius_km}km")
+        print(f"Interval:   {self.update_interval}s")
+        print(f"Database:   {self.config.db_path}")
         
         # Show authentication status
         if self.auth:
-            print(f"Auth:      OAuth2 (Client: {self.auth.client_id})")
+            print(f"Auth:       OAuth2 (Client: {self.auth.client_id})")
         else:
-            print(f"Auth:      Anonymous")
-            print(f"           💡 For better limits, set up OAuth2 credentials")
+            print(f"Auth:       Anonymous (for higher limits, set up OAuth2 credentials)")
         
         print("=" * 70)
         
@@ -316,10 +311,6 @@ class FlightCollector:
                 print(f"No flights detected ({self.consecutive_empty_scans} consecutive)")
             
             return 0
-        
-        if self.consecutive_empty_scans > 0:
-            print(f"✨ Flights detected again after {self.consecutive_empty_scans} empty scans")
-            self.consecutive_empty_scans = 0
         
         detected_flights = []
         for state in flights:
