@@ -4,7 +4,7 @@ LARA - Local Air Route Analysis
 Track, analyze, and visualize aircraft flights over your location.
 """
 
-__version__ = "0.1.0"
+__version__ = "v0.1.1"
 __author__ = "LARA Project"
 __license__ = "MIT"
 
