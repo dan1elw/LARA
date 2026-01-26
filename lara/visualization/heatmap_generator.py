@@ -53,7 +53,7 @@ class HeatmapGenerator:
         heat_data = []
         for row in cursor.fetchall():
             # Weight by proximity (closer = higher weight)
-            weight = 1.0 / (row['distance_from_home_km'] + 0.1)
+            weight = 1.0# / (row['distance_from_home_km'] + 0.1)
             heat_data.append([row['latitude'], row['longitude'], weight])
         
         print(f"   Plotting {len(heat_data)} positions...")
