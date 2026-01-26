@@ -219,4 +219,15 @@ class MapGenerator:
             filename: Output filename
         """
         self.map.save(filename)
+
+        # modify html file, in order to include title and favicon
+        with open(filename, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        line1 = '<title>LARA Map</title>'
+        line2 = '<link rel="icon" href="../docu/icon.ico">'
+        insert = "<head>\n    " + line1 + "\n    " + line2
+        html_content = html_content.replace("<head>", insert, 1)
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+
         print(f"✅ Map saved to: {filename}")
