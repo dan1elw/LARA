@@ -3,7 +3,7 @@ Visualization Constants
 """
 
 # Map configuration
-DEFAULT_MAP_STYLE = 'CartoDB.DarkMatter'
+DEFAULT_MAP_STYLE = 'CartoDB.Positron'
 DEFAULT_ZOOM = 10
 MAP_TILE_URLS = {
     'CartoDB.DarkMatter': 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
@@ -21,12 +21,12 @@ ALTITUDE_COLORS = {
     'cruise': '#9b59b6'         # Purple
 }
 
-HEATMAP_GRADIENT = {
-    0.0: '#313695',
-    0.25: '#4575b4',
-    0.5: '#fee090',
-    0.75: '#f46d43',
-    1.0: '#a50026'
+HEATMAP_GRADIENT = {    # Neon Plasma
+    0.0: '#120018',
+    0.25: '#6a00ff',
+    0.5: '#ff2fd2',
+    0.75: '#ff9f1c',
+    1.0: '#fff200'
 }
 
 # Flight path colors
