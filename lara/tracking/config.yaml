@@ -15,8 +15,7 @@ database:
 api:
   opensky_url: "https://opensky-network.org/api/states/all"
   timeout_seconds: 10
-  username: None  # put here your OpenSky username
-  password: None # and password
+  credentials_path: "credentials.json"
   
 logging:
   level: "INFO"

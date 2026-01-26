@@ -48,3 +48,6 @@ Thumbs.db
 
 # Visualization outputs
 visualizations/*.html
+
+# credentials.json containing API keys for Open Sky Network
+credentials.json

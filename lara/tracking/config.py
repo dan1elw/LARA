@@ -1,12 +1,11 @@
 """
 LARA Configuration Management
-Handles loading and accessing configuration from YAML files.
 """
 
 import yaml
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, Optional
 from .constants import DEFAULT_DB_PATH, DEFAULT_RADIUS_KM, DEFAULT_UPDATE_INTERVAL
 
 
@@ -54,8 +53,8 @@ class Config:
             'api': {
                 'opensky_url': 'https://opensky-network.org/api/states/all',
                 'timeout_seconds': 10,
-                'username': None,  # Optional: OpenSky username
-                'password': None   # Optional: OpenSky password
+                # OAuth2 credentials (new authentication method)
+                'credentials_path': None,  # Path to credentials.json from OpenSky
             },
             'logging': {
                 'level': 'INFO',
@@ -110,27 +109,6 @@ class Config:
     def api_timeout(self) -> int:
         """Get API timeout in seconds."""
         return self._config['api']['timeout_seconds']
-    
-    @property
-    def api_credentials(self) -> Optional[Tuple[str, str]]:
-        """
-        Get OpenSky API credentials.
-        
-        Returns:
-            Tuple of (username, password) if configured, None otherwise
-        """
-        username = self._config['api'].get('username')
-        password = self._config['api'].get('password')
-        
-        # Also check environment variables
-        if not username:
-            username = os.environ.get('OPENSKY_USERNAME')
-        if not password:
-            password = os.environ.get('OPENSKY_PASSWORD')
-        
-        if username and password:
-            return (username, password)
-        return None
     
     def get(self, key: str, default: Any = None) -> Any:
         """
