@@ -67,7 +67,7 @@ class HeatmapGenerator:
             heat_data,
             min_opacity=0.3,
             max_zoom=18,
-            radius=15,
+            radius=10,
             blur=20,
             gradient=HEATMAP_GRADIENT
         ).add_to(map_gen.map)
@@ -110,7 +110,7 @@ class HeatmapGenerator:
         plugins.HeatMap(
             heat_data,
             min_opacity=0.3,
-            radius=15,
+            radius=10,
             blur=20,
             gradient=HEATMAP_GRADIENT
         ).add_to(map_gen.map)
