@@ -13,12 +13,12 @@ MAP_TILE_URLS = {
 
 # Color schemes
 ALTITUDE_COLORS = {
-    'very_low': '#e74c3c',      # Red
-    'low': '#e67e22',           # Orange
-    'medium': '#f39c12',        # Yellow
-    'high': '#2ecc71',          # Green
-    'very_high': '#3498db',     # Blue
-    'cruise': '#9b59b6'         # Purple
+    'very_low':  '#ff3b3b',
+    'low':       '#ff7a18',
+    'medium':    '#f5e663',
+    'high':      '#00e5a8',
+    'very_high': '#00b4ff',
+    'cruise':    '#7c3aed'
 }
 
 HEATMAP_GRADIENT = {    # Neon Plasma

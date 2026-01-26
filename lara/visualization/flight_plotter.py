@@ -61,7 +61,7 @@ class FlightPlotter:
         map_gen.add_flight_path(positions, dict(flight))
         
         # Add position markers
-        map_gen.add_position_markers(positions)
+        #map_gen.add_position_markers(positions)
         
         # Save
         map_gen.save(output_file)

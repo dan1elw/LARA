@@ -110,16 +110,16 @@ class MapGenerator:
         ).add_to(self.map)
         
         # Add start marker
-        if coords:
-            folium.CircleMarker(
-                coords[0],
-                radius=5,
-                popup=f"Start: {flight_info.get('callsign')}",
-                color=color,
-                fill=True,
-                fillColor=color,
-                fillOpacity=0.7
-            ).add_to(self.map)
+        # if coords:
+        #     folium.CircleMarker(
+        #         coords[0],
+        #         radius=5,
+        #         popup=f"Start: {flight_info.get('callsign')}",
+        #         color=color,
+        #         fill=True,
+        #         fillColor=color,
+        #         fillOpacity=0.7
+        #     ).add_to(self.map)
     
     def add_position_markers(self, positions: List[Dict[str, Any]]):
         """
@@ -144,15 +144,15 @@ class MapGenerator:
             <b>Distance:</b> {pos.get('distance_from_home_km', 0):.2f} km
             """
             
-            folium.CircleMarker(
-                [pos['latitude'], pos['longitude']],
-                radius=MARKER_RADIUS,
-                popup=popup_html,
-                color=color,
-                fill=True,
-                fillColor=color,
-                fillOpacity=MARKER_OPACITY
-            ).add_to(marker_cluster)
+            # folium.CircleMarker(
+            #     [pos['latitude'], pos['longitude']],
+            #     radius=MARKER_RADIUS,
+            #     popup=popup_html,
+            #     color=color,
+            #     fill=True,
+            #     fillColor=color,
+            #     fillOpacity=MARKER_OPACITY
+            # ).add_to(marker_cluster)
     
     def add_corridor(self, corridor: Dict[str, Any], rank: int):
         """
