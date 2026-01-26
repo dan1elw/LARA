@@ -3,7 +3,7 @@ LARA Analysis Component
 Advanced analytics and pattern detection for flight data.
 """
 
-__version__ = "0.1.0"
+__version__ = "v0.1.1"
 
 from .analyzer import FlightAnalyzer
 from .corridor_detector import CorridorDetector

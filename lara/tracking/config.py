@@ -1,12 +1,11 @@
 """
 LARA Configuration Management
-Handles loading and accessing configuration from YAML files.
 """
 
 import yaml
 import os
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from .constants import DEFAULT_DB_PATH, DEFAULT_RADIUS_KM, DEFAULT_UPDATE_INTERVAL
 
 
@@ -40,9 +39,9 @@ class Config:
         """Get default configuration."""
         return {
             'location': {
-                'latitude': 50.28004,
-                'longitude': 8.455377,
-                'name': 'Schmitten im Taunus, Germany'
+                'latitude': 49.3508,
+                'longitude': 8.1364,
+                'name': 'Neustadt an der Weinstraße, Germany'
             },
             'tracking': {
                 'radius_km': DEFAULT_RADIUS_KM,
@@ -53,7 +52,9 @@ class Config:
             },
             'api': {
                 'opensky_url': 'https://opensky-network.org/api/states/all',
-                'timeout_seconds': 10
+                'timeout_seconds': 10,
+                # OAuth2 credentials (new authentication method)
+                'credentials_path': None,  # Path to credentials.json from OpenSky
             },
             'logging': {
                 'level': 'INFO',

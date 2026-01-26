@@ -3,7 +3,7 @@ LARA Visualization Component
 Interactive map visualizations for flight data and analysis results.
 """
 
-__version__ = "0.1.0"
+__version__ = "v0.1.1"
 
 from .map_generator import MapGenerator
 from .flight_plotter import FlightPlotter
