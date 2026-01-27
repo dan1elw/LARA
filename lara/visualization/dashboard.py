@@ -113,7 +113,8 @@ class Dashboard:
 <!DOCTYPE html>
 <html>
 <head>
-    <title>LARA Visualization Dashboard</title>
+    <title>LARA Dashboard</title>
+    <link rel="icon" href="../docu/icon.ico">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -198,8 +199,8 @@ class Dashboard:
 </head>
 <body>
     <div class="header">
-        <h1>🛩️ LARA Visualization Dashboard</h1>
-        <p>Interactive Flight Route Analysis</p>
+        <h1>🛩️ LARA Dashboard</h1>
+        <p>Local Air Route Analysis</p>
     </div>
     
     <div class="container">

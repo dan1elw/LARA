@@ -76,8 +76,7 @@ class OpenSkyAuth:
                     "credentials.json must contain 'clientId' and 'clientSecret'"
                 )
             
-            print(f"✅ Loaded OAuth2 credentials from {credentials_path}")
-            print(f"   Client ID: {self.client_id}")
+            print(f"✅ Loaded OAuth2 credentials for Client ID: {self.client_id}")
             
         except FileNotFoundError:
             raise FileNotFoundError(
@@ -148,8 +147,6 @@ class OpenSkyAuth:
         """
         # Check if we need a new token
         if force_refresh or not self._is_token_valid():
-            print("🔄 Requesting new OAuth2 access token...")
-            
             token_data = self._request_token()
             
             self.access_token = token_data.get('access_token')
@@ -239,8 +236,6 @@ class OpenSkyAuth:
             True if authentication successful, False otherwise
         """
         try:
-            print("🧪 Testing OAuth2 authentication...")
-            
             # Try to get a token
             token = self.get_token()
             
@@ -249,7 +244,6 @@ class OpenSkyAuth:
                 return False
             
             # Test with a simple API call
-            print("   Making test API request...")
             headers = self.get_auth_headers()
             response = requests.get(
                 "https://opensky-network.org/api/states/all",
@@ -258,21 +252,19 @@ class OpenSkyAuth:
             )
             
             if response.status_code == 200:
-                print("✅ Authentication test successful!")
-                print("   API responded with valid data")
+                print("✅ Authentification test successful!")
                 return True
             elif response.status_code == 401:
-                print(f"❌ Authentication test failed: Token not accepted (401)")
-                print(f"   The token was issued but API rejected it")
+                print(f"❌ Authentification test failed: Token not accepted (401)")
                 return False
             else:
-                print(f"❌ Authentication test failed: HTTP {response.status_code}")
+                print(f"❌ Authentification test failed: HTTP {response.status_code}")
                 if response.text:
                     print(f"   Response: {response.text[:200]}")
                 return False
                 
         except Exception as e:
-            print(f"❌ Authentication test failed: {e}")
+            print(f"❌ Authentification test failed: {e}")
             return False
     
     def invalidate_token(self):
@@ -363,12 +355,10 @@ def create_auth_from_config(config) -> Optional[Any]:
             if auth.test_authentication():
                 return auth
             else:
-                print("⚠️  OAuth2 authentication test failed")
-                print("   Falling back to anonymous mode")
+                print("⚠️  OAuth2 authentication test failed, falling back to anonymous mode")
                 return None
         except Exception as e:
-            print(f"⚠️  OAuth2 initialization failed: {e}")
-            print(f"   Falling back to anonymous mode")
+            print(f"⚠️  OAuth2 initialization failed: {e}, falling back to anonymous mode")
     
     # Try direct OAuth2 credentials
     client_id = config.get('api.client_id')

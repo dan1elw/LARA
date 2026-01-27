@@ -64,15 +64,15 @@ class MapGenerator:
         ).add_to(m)
         
         # Add circle showing tracking radius
-        folium.Circle(
-            radius=25000,  # 25km in meters
-            location=[self.center_lat, self.center_lon],
-            popup='Tracking Radius (25km)',
-            color='crimson',
-            fill=False,
-            weight=2,
-            opacity=0.5
-        ).add_to(m)
+        # folium.Circle(
+        #     radius=25000,  # 25km in meters
+        #     location=[self.center_lat, self.center_lon],
+        #     popup='Tracking Radius (25km)',
+        #     color='crimson',
+        #     fill=False,
+        #     weight=2,
+        #     opacity=0.5
+        # ).add_to(m)
         
         return m
     
@@ -110,16 +110,16 @@ class MapGenerator:
         ).add_to(self.map)
         
         # Add start marker
-        if coords:
-            folium.CircleMarker(
-                coords[0],
-                radius=5,
-                popup=f"Start: {flight_info.get('callsign')}",
-                color=color,
-                fill=True,
-                fillColor=color,
-                fillOpacity=0.7
-            ).add_to(self.map)
+        # if coords:
+        #     folium.CircleMarker(
+        #         coords[0],
+        #         radius=5,
+        #         popup=f"Start: {flight_info.get('callsign')}",
+        #         color=color,
+        #         fill=True,
+        #         fillColor=color,
+        #         fillOpacity=0.7
+        #     ).add_to(self.map)
     
     def add_position_markers(self, positions: List[Dict[str, Any]]):
         """
@@ -144,15 +144,15 @@ class MapGenerator:
             <b>Distance:</b> {pos.get('distance_from_home_km', 0):.2f} km
             """
             
-            folium.CircleMarker(
-                [pos['latitude'], pos['longitude']],
-                radius=MARKER_RADIUS,
-                popup=popup_html,
-                color=color,
-                fill=True,
-                fillColor=color,
-                fillOpacity=MARKER_OPACITY
-            ).add_to(marker_cluster)
+            # folium.CircleMarker(
+            #     [pos['latitude'], pos['longitude']],
+            #     radius=MARKER_RADIUS,
+            #     popup=popup_html,
+            #     color=color,
+            #     fill=True,
+            #     fillColor=color,
+            #     fillOpacity=MARKER_OPACITY
+            # ).add_to(marker_cluster)
     
     def add_corridor(self, corridor: Dict[str, Any], rank: int):
         """
@@ -219,4 +219,15 @@ class MapGenerator:
             filename: Output filename
         """
         self.map.save(filename)
+
+        # modify html file, in order to include title and favicon
+        with open(filename, 'r', encoding='utf-8') as f:
+            html_content = f.read()
+        line1 = '<title>LARA Map</title>'
+        line2 = '<link rel="icon" href="../docu/icon.ico">'
+        insert = "<head>\n    " + line1 + "\n    " + line2
+        html_content = html_content.replace("<head>", insert, 1)
+        with open(filename, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+
         print(f"✅ Map saved to: {filename}")
