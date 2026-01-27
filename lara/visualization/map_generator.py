@@ -4,7 +4,6 @@ Creates interactive Folium maps with flight data.
 """
 
 import folium
-from folium import plugins
 from typing import Dict, Any, List
 
 from .constants import (
