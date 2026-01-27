@@ -93,8 +93,8 @@ class Dashboard:
         if analysis_results and 'corridors' in analysis_results:
             corridors = analysis_results['corridors'].get('corridors', [])
             
-            for corridor in corridors[:20]:  # Top 20
-                map_gen.add_corridor(corridor, corridor['rank'])
+            for corridor in corridors[:10]:  # Top 10 corridors
+                map_gen.add_corridor_linear(corridor, corridor['rank'])
         else:
             # Fallback: query from database
             from lara.analysis import FlightAnalyzer
@@ -102,8 +102,8 @@ class Dashboard:
             result = analyzer.analyze_corridors()
             analyzer.close()
             
-            for corridor in result['corridors'][:20]:
-                map_gen.add_corridor(corridor, corridor['rank'])
+            for corridor in result['corridors'][:10]:
+                map_gen.add_corridor_linear(corridor, corridor['rank'])
         
         map_gen.save(str(self.output_dir / 'corridors.html'))
     

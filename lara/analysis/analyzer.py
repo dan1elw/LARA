@@ -12,6 +12,7 @@ from .corridor_detector import CorridorDetector
 from .pattern_matcher import PatternMatcher
 from .statistics import StatisticsEngine
 from .reporter import ReportGenerator
+from .constants import DEFAULT_GRID_SIZE_KM, MIN_CORRIDOR_FLIGHTS
 
 
 class FlightAnalyzer:
@@ -80,9 +81,9 @@ class FlightAnalyzer:
         
         return results
     
-    def analyze_corridors(self, grid_size_km: float = 5.0) -> Dict[str, Any]:
+    def analyze_corridors(self, grid_size_km: float) -> Dict[str, Any]:
         """Run only corridor analysis."""
-        return self.corridor_detector.detect_corridors(grid_size_km)
+        return self.corridor_detector.detect_corridors()
     
     def analyze_patterns(self) -> Dict[str, Any]:
         """Run only pattern analysis."""

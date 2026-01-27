@@ -4,7 +4,8 @@ Analysis Constants
 
 # Grid-based clustering
 DEFAULT_GRID_SIZE_KM = 5.0
-MIN_CORRIDOR_FLIGHTS = 10  # Minimum flights to consider a corridor
+MIN_CORRIDOR_FLIGHTS = 20  # Minimum flights to consider a corridor
+MIN_POSITIONS_FOR_CORRIDOR = 15
 
 # Time analysis
 PEAK_HOUR_THRESHOLD = 0.7  # 70% of max hourly traffic

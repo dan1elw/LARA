@@ -86,7 +86,7 @@ def main():
     try:
         if args.corridors_only:
             # Run only corridor analysis
-            results = analyzer.analyze_corridors(grid_size_km=args.grid_size)
+            results = analyzer.analyze_corridors()
             print(f"\n✅ Corridor analysis complete!")
             
         elif args.patterns_only:
