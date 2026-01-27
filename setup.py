@@ -29,6 +29,9 @@ setup(
         "requests>=2.31.0",
         "pyyaml>=6.0",
         "folium>=0.15.0",
+        "scikit-learn>=1.0.0",
+        "numpy>=1.20.0",
+        "scipy>=1.7.0"
     ],
     extras_require={
         "dev": [
