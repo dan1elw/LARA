@@ -30,17 +30,15 @@ from . import constants
 
 __all__ = [
     # Main classes
-    'Config',
-    'FlightDatabase',
-    'FlightCollector',
-    'FlightReader',
-    
+    "Config",
+    "FlightDatabase",
+    "FlightCollector",
+    "FlightReader",
     # Authentication
-    'OpenSkyAuth',
-    'OpenSkyBasicAuth',
-    'create_auth_from_config',
-    
+    "OpenSkyAuth",
+    "OpenSkyBasicAuth",
+    "create_auth_from_config",
     # Modules
-    'utils',
-    'constants',
+    "utils",
+    "constants",
 ]

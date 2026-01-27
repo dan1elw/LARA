@@ -10,23 +10,25 @@ HOME_LAT = 50.1137
 HOME_LON = 8.6796
 RADIUS_KM = 25  # Search radius in kilometers
 
+
 def haversine_distance(lat1, lon1, lat2, lon2):
     """
-    Calculate the great circle distance between two points 
+    Calculate the great circle distance between two points
     on the earth (specified in decimal degrees)
     Returns distance in kilometers
     """
     R = 6371  # Radius of the earth in km
-    
+
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-    
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1-a))
+
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
     distance = R * c
-    
+
     return distance
+
 
 def get_bounding_box(lat, lon, radius_km):
     """
@@ -37,13 +39,14 @@ def get_bounding_box(lat, lon, radius_km):
     # 1 degree longitude varies by latitude
     lat_delta = radius_km / 111.0
     lon_delta = radius_km / (111.0 * cos(radians(lat)))
-    
+
     return (
         lat - lat_delta,  # lamin
         lon - lon_delta,  # lomin
         lat + lat_delta,  # lamax
-        lon + lon_delta   # lomax
+        lon + lon_delta,  # lomax
     )
+
 
 def fetch_flights():
     """
@@ -51,23 +54,24 @@ def fetch_flights():
     """
     # Get bounding box
     lamin, lomin, lamax, lomax = get_bounding_box(HOME_LAT, HOME_LON, RADIUS_KM)
-    
+
     # OpenSky Network API endpoint
     url = f"https://opensky-network.org/api/states/all?lamin={lamin}&lomin={lomin}&lamax={lamax}&lomax={lomax}"
-    
+
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
-        
-        if data and 'states' in data and data['states']:
-            return data['states']
+
+        if data and "states" in data and data["states"]:
+            return data["states"]
         else:
             return []
-    
+
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")
         return []
+
 
 def display_flight_info(state):
     """
@@ -84,18 +88,18 @@ def display_flight_info(state):
     altitude = state[7] if state[7] else state[13]  # baro_altitude or geo_altitude
     velocity = state[9]
     heading = state[10]
-    
+
     # Calculate distance from home
     if lat and lon:
         distance = haversine_distance(HOME_LAT, HOME_LON, lat, lon)
     else:
         distance = None
-    
+
     print(f"\n{'='*60}")
     print(f"Callsign:     {callsign}")
     print(f"ICAO24:       {icao24}")
     print(f"Origin:       {origin}")
-    
+
     if lat and lon:
         print(f"Position:     {lat:.4f}°, {lon:.4f}°")
     if distance:
@@ -107,6 +111,7 @@ def display_flight_info(state):
     if heading:
         print(f"Heading:      {heading:.1f}°")
 
+
 def main():
     """
     Main function to continuously monitor flights
@@ -116,45 +121,50 @@ def main():
     print(f"📡 Monitoring radius: {RADIUS_KM} km")
     print(f"{'='*60}\n")
     print("Press Ctrl+C to stop\n")
-    
+
     try:
         while True:
-            print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Fetching flights...")
-            
+            print(
+                f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Fetching flights..."
+            )
+
             flights = fetch_flights()
-            
+
             if flights:
                 # Filter flights within radius and sort by distance
                 nearby_flights = []
-                
+
                 for state in flights:
                     lat = state[6]
                     lon = state[5]
-                    
+
                     if lat and lon:
                         distance = haversine_distance(HOME_LAT, HOME_LON, lat, lon)
                         if distance <= RADIUS_KM:
                             nearby_flights.append((distance, state))
-                
+
                 # Sort by distance (closest first)
                 nearby_flights.sort(key=lambda x: x[0])
-                
+
                 print(f"Found {len(nearby_flights)} flight(s) within {RADIUS_KM} km")
-                
+
                 for distance, state in nearby_flights:
                     display_flight_info(state)
             else:
                 print("No flights detected in the area")
-            
+
             print(f"\n{'='*60}")
             print("Waiting 10 seconds before next update...")
-            print("(OpenSky Network recommends max 1 request per 10 seconds for anonymous users)")
+            print(
+                "(OpenSky Network recommends max 1 request per 10 seconds for anonymous users)"
+            )
             time.sleep(10)
-    
+
     except KeyboardInterrupt:
         print("\n\n👋 Flight tracking stopped by user")
     except Exception as e:
         print(f"\n❌ Unexpected error: {e}")
+
 
 if __name__ == "__main__":
     main()
