@@ -44,10 +44,10 @@ def sample_results():
     }
 
 
-class ReportTester():
+class TestReportGenerator:
     """Tests for ReportGenerator class."""
 
-    def test_generate_json_report(tmp_path, sample_results):
+    def test_generate_json_report(self, tmp_path, sample_results):
         """Test JSON report generation."""
         output_file = tmp_path / "report.json"
         generator = ReportGenerator()
@@ -62,8 +62,7 @@ class ReportTester():
         assert data["metadata"]["database"] == "test_db"
         assert data["statistics"]["overview"]["total_flights"] == 12345
 
-
-    def test_generate_text_report(tmp_path, sample_results):
+    def test_generate_text_report(self, tmp_path, sample_results):
         """Test text report generation."""
         output_file = tmp_path / "report.txt"
         generator = ReportGenerator()
@@ -79,8 +78,7 @@ class ReportTester():
         assert "FLIGHT CORRIDORS (Top 10)" in content
         assert "# 1:" in content
 
-
-    def test_generate_html_report(tmp_path, sample_results):
+    def test_generate_html_report(self, tmp_path, sample_results):
         """Test HTML report generation."""
         output_file = tmp_path / "report.html"
         generator = ReportGenerator()
@@ -96,14 +94,14 @@ class ReportTester():
         assert "(51.5074, -0.1278)" in content
         assert "11000 m" in content
 
-
-    def test_unsupported_format_raises_error(tmp_path, sample_results):
+    def test_unsupported_format_raises_error(self, tmp_path, sample_results):
         """Test that unsupported format raises ValueError."""
         output_file = tmp_path / "report.xyz"
         generator = ReportGenerator()
 
         with pytest.raises(ValueError, match="Unsupported format"):
             generator.generate_report(sample_results, output_file, format="xml")
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
