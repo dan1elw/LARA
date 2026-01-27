@@ -5,8 +5,6 @@ Creates comprehensive analysis reports in various formats.
 
 import json
 from typing import Dict, Any
-from datetime import datetime
-from pathlib import Path
 
 
 class ReportGenerator:
@@ -58,7 +56,7 @@ class ReportGenerator:
             
             # Corridors
             corridors = results['corridors']
-            f.write(f"FLIGHT CORRIDORS (Top 10)\n")
+            f.write("FLIGHT CORRIDORS (Top 10)\n")
             f.write("-" * 70 + "\n")
             for corridor in corridors['corridors'][:10]:
                 f.write(f"  #{corridor['rank']:2d}: ({corridor['center_lat']:.4f}, {corridor['center_lon']:.4f})\n")

@@ -5,8 +5,6 @@ Handles OAuth2 Client Credentials Flow for OpenSky API using Keycloak.
 
 import requests
 import json
-import time
-from pathlib import Path
 from typing import Optional, Dict, Any
 from datetime import datetime, timedelta
 
@@ -121,7 +119,7 @@ class OpenSkyAuth:
                     error_data = response.json()
                     error_msg += f"\nError: {error_data.get('error', 'unknown')}"
                     error_msg += f"\nDescription: {error_data.get('error_description', 'no description')}"
-                except:
+                except Exception:
                     error_msg += f"\nResponse: {response.text[:200]}"
                 
                 raise Exception(error_msg)
@@ -255,7 +253,7 @@ class OpenSkyAuth:
                 print("✅ Authentification test successful!")
                 return True
             elif response.status_code == 401:
-                print(f"❌ Authentification test failed: Token not accepted (401)")
+                print("❌ Authentification test failed: Token not accepted (401)")
                 return False
             else:
                 print(f"❌ Authentification test failed: HTTP {response.status_code}")

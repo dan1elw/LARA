@@ -228,8 +228,8 @@ Examples:
             # No option specified, show help
             parser.print_help()
             sys.exit(1)
-    
-    except FileNotFoundError as e:
+
+    except FileNotFoundError:
         print(f"❌ Database not found: {db_path}")
         print("   Run the collector first: python scripts/collect.py")
         sys.exit(1)

@@ -4,10 +4,8 @@ SQLite database operations for storing and querying flight data.
 """
 
 import sqlite3
-import os
 from pathlib import Path
-from typing import Optional, List, Dict, Any, Tuple
-from datetime import datetime
+from typing import Optional, List, Dict, Any
 from .constants import FLIGHT_SESSION_TIMEOUT_MINUTES
 
 

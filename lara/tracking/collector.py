@@ -10,7 +10,7 @@ from .database import FlightDatabase
 from .config import Config
 from .utils import haversine_distance, get_bounding_box, parse_state_vector
 from .constants import MIN_UPDATE_INTERVAL
-from .auth import create_auth_from_config, OpenSkyAuth
+from .auth import create_auth_from_config
 
 
 class FlightCollector:
@@ -98,18 +98,18 @@ class FlightCollector:
                 if retry_after:
                     try:
                         wait_time = int(retry_after)
-                    except:
+                    except Exception:
                         wait_time = 60
                 else:
                     wait_time = min(60 * self.rate_limit_count, 300)
                 
-                print(f"⚠️  Rate limited by OpenSky Network (429)")
+                print("⚠️  Rate limited by OpenSky Network (429)")
                 print(f"   This is hit #{self.rate_limit_count}")
                 print(f"   Waiting {wait_time} seconds before retrying...")
                 
                 if not self.auth:
-                    print(f"   💡 Tip: Set up OAuth2 authentication for better limits")
-                    print(f"   💡 Download credentials.json from opensky-network.org")
+                    print("   💡 Tip: Set up OAuth2 authentication for better limits")
+                    print("   💡 Download credentials.json from opensky-network.org")
                 
                 time.sleep(wait_time)
                 
@@ -131,7 +131,7 @@ class FlightCollector:
                     self.last_request_time = time.time()
                     
                     if response.status_code == 429:
-                        print(f"   Still rate limited after waiting. Skipping this scan.")
+                        print("   Still rate limited after waiting. Skipping this scan.")
                         return []
                 except Exception as e:
                     print(f"   Retry failed: {e}")
@@ -163,7 +163,7 @@ class FlightCollector:
         
         except requests.exceptions.HTTPError as e:
             if e.response.status_code == 401:
-                print(f"❌ Authentication failed (401): Your OAuth2 credentials may be invalid, check your credentials.json file")
+                print("❌ Authentication failed (401): Your OAuth2 credentials may be invalid, check your credentials.json file")
                 return []
             elif e.response.status_code == 429:
                 # Already handled above
@@ -228,7 +228,7 @@ class FlightCollector:
                 'velocity': state_data.get('velocity')
             }
         
-        except Exception as e:
+        except Exception:
             return None
     
     def display_flight_info(self, flight_info: Dict[str, Any]):
@@ -267,7 +267,7 @@ class FlightCollector:
         if self.auth:
             print(f"Auth:       OAuth2 (Client: {self.auth.client_id})")
         else:
-            print(f"Auth:       Anonymous (for higher limits, set up OAuth2 credentials)")
+            print("Auth:       Anonymous (for higher limits, set up OAuth2 credentials)")
         
         print("=" * 70)
         
@@ -282,7 +282,7 @@ class FlightCollector:
         """Print current database statistics."""
         try:
             stats = self.db.get_statistics()
-            print(f"\n📊 Current Database Statistics:")
+            print("\n📊 Current Database Statistics:")
             print(f"   Total flights tracked: {stats['total_flights']:,}")
             print(f"   Unique aircraft: {stats['unique_aircraft']:,}")
             print(f"   Total positions logged: {stats['total_positions']:,}")
@@ -399,14 +399,14 @@ class FlightCollector:
         
         try:
             stats = self.db.get_statistics()
-            print(f"\n📊 Final Statistics:")
+            print("\n📊 Final Statistics:")
             print(f"   Total scans: {self.iteration_count:,}")
             print(f"   Empty scans: {self.total_empty_scans:,} ({(self.total_empty_scans/max(self.iteration_count, 1)*100):.1f}%)")
             
             if self.rate_limit_count > 0:
                 print(f"   Rate limit hits: {self.rate_limit_count}")
                 if not self.auth:
-                    print(f"   💡 Set up OAuth2 for better limits")
+                    print("   💡 Set up OAuth2 for better limits")
             
             print(f"   Total flights tracked: {stats['total_flights']:,}")
             print(f"   Unique aircraft: {stats['unique_aircraft']:,}")

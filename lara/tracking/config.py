@@ -4,8 +4,7 @@ LARA Configuration Management
 
 import yaml
 import os
-from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from .constants import DEFAULT_DB_PATH, DEFAULT_RADIUS_KM, DEFAULT_UPDATE_INTERVAL
 
 

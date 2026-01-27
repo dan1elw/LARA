@@ -69,7 +69,7 @@ def stats_db():
     conn.close()
     try:
         os.unlink(db_path)
-    except:
+    except Exception:
         pass
 
 

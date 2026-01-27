@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - CI
 
 jobs:
   tests:
@@ -26,7 +27,7 @@ jobs:
           pip install ruff black pytest pytest-cov
 
       - name: Ruff (lint)
-        run: ruff check .
+        run: ruff check lara/ tests/
 
       - name: Black (format check)
         run: black --check .

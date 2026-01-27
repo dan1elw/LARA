@@ -6,8 +6,6 @@ Query and analyze stored flight data.
 import sqlite3
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional
-from .database import FlightDatabase
-from .utils import format_altitude, format_speed, format_duration
 
 
 class FlightReader:

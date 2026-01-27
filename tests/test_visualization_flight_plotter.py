@@ -62,7 +62,7 @@ def plotter_db():
     
     try:
         os.unlink(db_path)
-    except:
+    except Exception:
         pass
 
 

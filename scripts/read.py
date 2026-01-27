@@ -66,7 +66,7 @@ def display_recent_flights(reader: FlightReader):
     """Display recent flights."""
     flights = reader.get_recent_flights(hours=24, limit=20)
     
-    print(f"\n✈️  RECENT FLIGHTS (Last 24 hours)")
+    print("\n✈️  RECENT FLIGHTS (Last 24 hours)")
     print("=" * 110)
     print(f"{'Callsign':<10} {'ICAO24':<8} {'Country':<20} {'First Seen':<20} {'Duration':<10} {'Min Dist':<10} {'Altitude Range':<15}")
     print("-" * 110)
@@ -90,7 +90,7 @@ def display_top_airlines(reader: FlightReader):
     """Display top airlines."""
     airlines = reader.get_top_airlines(limit=10)
     
-    print(f"\n🏢 TOP 10 AIRLINES/OPERATORS")
+    print("\n🏢 TOP 10 AIRLINES/OPERATORS")
     print("=" * 70)
     print(f"{'Code':<6} {'Flights':<10} {'Avg Min Distance':<20} {'Avg Altitude':<15}")
     print("-" * 70)
@@ -104,7 +104,7 @@ def display_countries(reader: FlightReader):
     """Display flights by country."""
     countries = reader.get_countries(limit=15)
     
-    print(f"\n🌍 FLIGHTS BY COUNTRY")
+    print("\n🌍 FLIGHTS BY COUNTRY")
     print("=" * 60)
     print(f"{'Country':<25} {'Flights':<12} {'Avg Min Distance':<15}")
     print("-" * 60)
@@ -118,7 +118,7 @@ def display_hourly_distribution(reader: FlightReader):
     """Display hourly distribution."""
     hours = reader.get_hourly_distribution()
     
-    print(f"\n🕐 HOURLY FLIGHT DISTRIBUTION")
+    print("\n🕐 HOURLY FLIGHT DISTRIBUTION")
     print("=" * 70)
     
     if hours:
@@ -136,7 +136,7 @@ def display_altitude_distribution(reader: FlightReader):
     """Display altitude distribution."""
     altitudes = reader.get_altitude_distribution()
     
-    print(f"\n📏 ALTITUDE DISTRIBUTION")
+    print("\n📏 ALTITUDE DISTRIBUTION")
     print("=" * 70)
     
     if altitudes:
@@ -154,7 +154,7 @@ def display_closest_flights(reader: FlightReader):
     """Display closest flights."""
     flights = reader.get_closest_flights(limit=10)
     
-    print(f"\n🎯 CLOSEST FLIGHTS")
+    print("\n🎯 CLOSEST FLIGHTS")
     print("=" * 90)
     print(f"{'Callsign':<10} {'ICAO24':<8} {'Country':<20} {'Distance':<12} {'Altitude':<12} {'Position':<20}")
     print("-" * 90)
@@ -172,7 +172,7 @@ def display_daily_stats(reader: FlightReader):
     """Display daily statistics."""
     stats = reader.get_daily_stats(days=7)
     
-    print(f"\n📅 DAILY STATISTICS (Last 7 days)")
+    print("\n📅 DAILY STATISTICS (Last 7 days)")
     print("=" * 70)
     print(f"{'Date':<12} {'Flights':<10} {'Avg Min Distance':<20} {'Avg Altitude':<15}")
     print("-" * 70)

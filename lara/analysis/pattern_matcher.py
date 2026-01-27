@@ -4,8 +4,6 @@ Identifies recurring flight routes and patterns.
 """
 
 from typing import Dict, Any, List
-from collections import defaultdict
-from datetime import datetime, timedelta
 
 from .constants import MIN_PATTERN_OCCURRENCES
 

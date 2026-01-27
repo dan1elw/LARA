@@ -2,7 +2,6 @@
 Tests for map generator.
 """
 
-import pytest
 import sys
 import tempfile
 from pathlib import Path

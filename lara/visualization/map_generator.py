@@ -5,13 +5,11 @@ Creates interactive Folium maps with flight data.
 
 import folium
 from folium import plugins
-from typing import Dict, Any, List, Tuple, Optional
-import json
+from typing import Dict, Any, List
 
 from .constants import (
     DEFAULT_MAP_STYLE, DEFAULT_ZOOM, MAP_TILE_URLS,
-    ALTITUDE_COLORS, FLIGHT_PATH_COLOR, FLIGHT_PATH_WEIGHT,
-    FLIGHT_PATH_OPACITY, MARKER_RADIUS, MARKER_OPACITY
+    ALTITUDE_COLORS, FLIGHT_PATH_WEIGHT, FLIGHT_PATH_OPACITY
 )
 
 
@@ -128,21 +126,23 @@ class MapGenerator:
         Args:
             positions: List of position dictionaries
         """
-        marker_cluster = plugins.MarkerCluster().add_to(self.map)
+        pass
+
+        # _ = plugins.MarkerCluster().add_to(self.map)
         
-        for pos in positions:
-            if not pos.get('latitude') or not pos.get('longitude'):
-                continue
+        # for pos in positions:
+        #     if not pos.get('latitude') or not pos.get('longitude'):
+        #         continue
             
-            altitude = pos.get('altitude_m', 0)
-            color = self._get_altitude_color(altitude)
+        #     altitude = pos.get('altitude_m', 0)
+        #     color = self._get_altitude_color(altitude)
             
-            popup_html = f"""
-            <b>Altitude:</b> {altitude:.0f} m<br>
-            <b>Speed:</b> {pos.get('velocity_ms', 0) * 3.6:.1f} km/h<br>
-            <b>Heading:</b> {pos.get('heading', 0):.0f}°<br>
-            <b>Distance:</b> {pos.get('distance_from_home_km', 0):.2f} km
-            """
+        #     popup_html = f"""
+        #     <b>Altitude:</b> {altitude:.0f} m<br>
+        #     <b>Speed:</b> {pos.get('velocity_ms', 0) * 3.6:.1f} km/h<br>
+        #     <b>Heading:</b> {pos.get('heading', 0):.0f}°<br>
+        #     <b>Distance:</b> {pos.get('distance_from_home_km', 0):.2f} km
+        #     """
             
             # folium.CircleMarker(
             #     [pos['latitude'], pos['longitude']],

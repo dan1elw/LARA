@@ -4,7 +4,6 @@ Specialized plotting for individual flights and routes.
 """
 
 import sqlite3
-from typing import List, Dict, Any, Optional
 from .map_generator import MapGenerator
 
 

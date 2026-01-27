@@ -30,7 +30,7 @@ def temp_db():
     # Cleanup
     try:
         os.unlink(path)
-    except:
+    except Exception:
         pass
 
 

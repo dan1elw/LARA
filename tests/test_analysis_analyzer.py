@@ -57,7 +57,7 @@ def full_db():
     
     try:
         os.unlink(db_path)
-    except:
+    except Exception:
         pass
 
 
@@ -119,7 +119,7 @@ class TestFlightAnalyzer:
             analyzer.close()
             try:
                 os.unlink(output_path)
-            except:
+            except Exception:
                 pass
 
 

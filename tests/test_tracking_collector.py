@@ -7,7 +7,7 @@ import sys
 import os
 import tempfile
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from datetime import datetime
 from requests.exceptions import RequestException
 
@@ -38,7 +38,7 @@ def temp_config():
     # Cleanup
     try:
         os.unlink(db_path)
-    except:
+    except Exception:
         pass
 
 

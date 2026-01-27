@@ -87,21 +87,21 @@ def main():
         if args.corridors_only:
             # Run only corridor analysis
             results = analyzer.analyze_corridors(grid_size_km=args.grid_size)
-            print(f"\n✅ Corridor analysis complete!")
+            print("\n✅ Corridor analysis complete!")
             
         elif args.patterns_only:
             # Run only pattern analysis
             results = analyzer.analyze_patterns()
-            print(f"\n✅ Pattern analysis complete!")
+            print("\n✅ Pattern analysis complete!")
             
         elif args.stats_only:
             # Run only statistical analysis
             results = analyzer.get_statistics()
-            print(f"\n✅ Statistical analysis complete!")
+            print("\n✅ Statistical analysis complete!")
             
         else:
             # Run full analysis
-            results = analyzer.analyze_all(output_path=args.output)
+            _ = analyzer.analyze_all(output_path=args.output)
             print(f"\n✅ Complete analysis saved to: {args.output}")
     
     except Exception as e:

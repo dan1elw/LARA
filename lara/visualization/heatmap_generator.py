@@ -3,12 +3,10 @@ Heatmap Generator
 Creates density heatmaps of flight activity.
 """
 
-import folium
 from folium import plugins
 import sqlite3
-from typing import List, Tuple
 
-from .constants import DEFAULT_MAP_STYLE, DEFAULT_ZOOM, HEATMAP_GRADIENT
+from .constants import HEATMAP_GRADIENT
 
 
 class HeatmapGenerator:
