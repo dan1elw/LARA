@@ -89,7 +89,7 @@ def empty_db() -> str:
 
     try:
         os.unlink(db_path)
-    except:
+    except Exception:
         pass
 
 
@@ -260,7 +260,7 @@ def populated_db() -> str:
 
     try:
         os.unlink(db_path)
-    except:
+    except Exception:
         pass
 
 
@@ -293,7 +293,7 @@ class TestFlightReaderInitialization:
     def test_init_with_nonexistent_database(self):
         """Test initialization with nonexistent database fails gracefully."""
         with pytest.raises(sqlite3.OperationalError):
-            reader = FlightReader("/nonexistent/database.db")
+            _ = FlightReader("/nonexistent/database.db")
 
     def test_close_connection(self, populated_db: str):
         """Test closing database connection."""

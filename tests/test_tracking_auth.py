@@ -51,7 +51,7 @@ def credentials_file(valid_credentials: Dict[str, str]) -> str:
     # Cleanup
     try:
         os.unlink(path)
-    except:
+    except Exception:
         pass
 
 
@@ -67,7 +67,7 @@ def invalid_credentials_file() -> str:
 
     try:
         os.unlink(path)
-    except:
+    except Exception:
         pass
 
 
