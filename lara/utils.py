@@ -5,7 +5,7 @@ Common utility functions for distance calculations and data processing.
 
 from math import radians, sin, cos, sqrt, atan2
 from typing import Tuple
-from .constants import EARTH_RADIUS_KM, KM_PER_DEGREE_LAT
+from .tracking.constants import EARTH_RADIUS_KM, KM_PER_DEGREE_LAT
 
 
 def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -89,7 +89,7 @@ def format_altitude(altitude_m: float, include_feet: bool = True) -> str:
         return "N/A"
 
     if include_feet:
-        from .constants import METERS_TO_FEET
+        from .tracking.constants import METERS_TO_FEET
 
         feet = altitude_m * METERS_TO_FEET
         return f"{altitude_m:.0f} m ({feet:.0f} ft)"
@@ -116,7 +116,7 @@ def format_speed(velocity_ms: float, unit: str = "kmh") -> str:
         return "N/A"
 
     if unit == "kmh":
-        from .constants import MS_TO_KMH
+        from .tracking.constants import MS_TO_KMH
 
         return f"{velocity_ms * MS_TO_KMH:.1f} km/h"
     elif unit == "knots":

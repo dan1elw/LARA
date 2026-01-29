@@ -25,7 +25,6 @@ from .reader import FlightReader
 from .auth import OpenSkyAuth, OpenSkyBasicAuth, create_auth_from_config
 
 # Utilities
-from . import utils
 from . import constants
 
 __all__ = [

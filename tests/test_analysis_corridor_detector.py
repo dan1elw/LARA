@@ -27,6 +27,8 @@ from lara.analysis.corridor_detector import (
     Corridor,
 )
 
+from lara.analysis.constants import MIN_LINEARITY_SCORE, MIN_CORRIDOR_LENGTH_KM
+
 
 @pytest.fixture
 def linear_corridor_db():
@@ -193,8 +195,6 @@ class TestCorridorDetector:
         """Test detector initialization."""
         detector = CorridorDetector(linear_corridor_db)
         assert detector.conn is not None
-        assert detector.HEADING_TOLERANCE_DEG == 30.0
-        assert detector.PROXIMITY_THRESHOLD_KM == 10.0
 
     def test_load_positions(self, linear_corridor_db):
         """Test position loading from database."""
@@ -385,8 +385,8 @@ class TestCorridorDetector:
 
         # All corridors should meet quality thresholds
         for corridor in result["corridors"]:
-            assert corridor["linearity_score"] >= detector.MIN_LINEARITY_SCORE
-            assert corridor["length_km"] >= detector.MIN_CORRIDOR_LENGTH_KM
+            assert corridor["linearity_score"] >= MIN_LINEARITY_SCORE
+            assert corridor["length_km"] >= MIN_CORRIDOR_LENGTH_KM
 
     def test_corridor_to_dict(self, linear_corridor_db):
         """Test corridor serialization to dictionary."""

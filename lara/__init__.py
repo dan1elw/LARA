@@ -24,9 +24,11 @@ __license__ = "MIT"
 from . import tracking
 from . import analysis
 from . import visualization
+from . import utils
 
 __all__ = [
     "tracking",
     "analysis",
     "visualization",
+    "utils",
 ]
