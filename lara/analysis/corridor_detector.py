@@ -25,6 +25,8 @@ from lara.analysis.constants import (
     MIN_FLIGHTS_FOR_CORRIDOR
 )
 
+from ..utils import haversine_distance, perpendicular_distance, calculate_bearing
+
 # Type alias for database row (since we can't import sqlite3.Row type)
 DbRow = Any
 
@@ -314,7 +316,7 @@ class CorridorDetector:
 
                     # Check if close to any position in current group
                     is_close = any(
-                        self._haversine_distance(
+                        haversine_distance(
                             pos.latitude, pos.longitude, g.latitude, g.longitude
                         )
                         < proximity_km
@@ -377,7 +379,7 @@ class CorridorDetector:
 
         # Calculate perpendicular distances for width estimation
         distances = [
-            self._perpendicular_distance(p.latitude, p.longitude, line)
+            perpendicular_distance(p.latitude, p.longitude, line)
             for p in positions
         ]
         width_km = 2 * (sum(distances) / len(distances))  # Average distance * 2
@@ -486,10 +488,10 @@ class CorridorDetector:
                 end_lat = slope * max_lon + intercept
 
         # Calculate heading
-        heading = self._calculate_bearing(start_lat, start_lon, end_lat, end_lon)
+        heading = calculate_bearing(start_lat, start_lon, end_lat, end_lon)
 
         # Calculate length
-        length = self._haversine_distance(start_lat, start_lon, end_lat, end_lon)
+        length = haversine_distance(start_lat, start_lon, end_lat, end_lon)
 
         return LineSegment(
             start_lat=start_lat,
@@ -499,117 +501,6 @@ class CorridorDetector:
             heading=heading,
             length_km=length,
         )
-
-    def _perpendicular_distance(
-        self, lat: float, lon: float, line: LineSegment
-    ) -> float:
-        """
-        Calculate perpendicular distance from point to line.
-
-        Uses cross product formula to find the shortest distance
-        from a point to a line segment. This is an approximation
-        that works well for small distances.
-
-        Args:
-            lat: Point latitude
-            lon: Point longitude
-            line: Line segment
-
-        Returns:
-            Distance in kilometers
-        """
-        # Simple approximation using cross product
-        # For small distances this is sufficiently accurate
-
-        # Vector from line start to point
-        dx1 = lon - line.start_lon
-        dy1 = lat - line.start_lat
-
-        # Vector along line
-        dx2 = line.end_lon - line.start_lon
-        dy2 = line.end_lat - line.start_lat
-
-        # Normalize line vector
-        line_length = math.sqrt(dx2**2 + dy2**2)
-        if line_length < 1e-10:
-            return self._haversine_distance(lat, lon, line.start_lat, line.start_lon)
-
-        dx2 /= line_length
-        dy2 /= line_length
-
-        # Calculate perpendicular distance (cross product magnitude)
-        cross = abs(dx1 * dy2 - dy1 * dx2)
-
-        # Convert to kilometers (approximate)
-        return cross * 111.0  # degrees to km
-
-    def _haversine_distance(
-        self, lat1: float, lon1: float, lat2: float, lon2: float
-    ) -> float:
-        """
-        Calculate great circle distance between two points using Haversine formula.
-
-        The Haversine formula calculates the shortest distance over the earth's
-        surface, giving an "as-the-crow-flies" distance between two points
-        (ignoring any hills they fly over, of course!).
-
-        Args:
-            lat1, lon1: First point coordinates (degrees)
-            lat2, lon2: Second point coordinates (degrees)
-
-        Returns:
-            Distance in kilometers
-
-        Example:
-            >>> distance = self._haversine_distance(49.35, 8.14, 49.36, 8.15)
-            >>> print(f"{distance:.2f} km")
-        """
-        R = 6371  # Earth radius in km
-
-        lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
-
-        dlat = lat2 - lat1
-        dlon = lon2 - lon1
-
-        a = (
-            math.sin(dlat / 2) ** 2
-            + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
-        )
-        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-
-        return R * c
-
-    def _calculate_bearing(
-        self, lat1: float, lon1: float, lat2: float, lon2: float
-    ) -> float:
-        """
-        Calculate bearing (direction) from point 1 to point 2.
-
-        Returns the initial bearing (forward azimuth) from the first
-        point to the second point. Note that the bearing may change
-        along a great circle path.
-
-        Args:
-            lat1, lon1: Start point (degrees)
-            lat2, lon2: End point (degrees)
-
-        Returns:
-            Bearing in degrees (0-360, where 0/360=North, 90=East, 180=South, 270=West)
-        """
-        lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
-
-        dlon = lon2 - lon1
-
-        x = math.sin(dlon) * math.cos(lat2)
-        y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(
-            lat2
-        ) * math.cos(dlon)
-
-        bearing = math.atan2(x, y)
-        bearing = math.degrees(bearing)
-        bearing = (bearing + 360) % 360
-
-        return bearing
 
     def _corridor_to_dict(self, corridor: Corridor) -> Dict[str, Any]:
         """

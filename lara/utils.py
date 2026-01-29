@@ -3,14 +3,18 @@ LARA Utility Functions
 Common utility functions for distance calculations and data processing.
 """
 
-from math import radians, sin, cos, sqrt, atan2
+from math import radians, sin, cos, sqrt, atan2, degrees
 from typing import Tuple
-from .tracking.constants import EARTH_RADIUS_KM, KM_PER_DEGREE_LAT
+from .tracking.constants import EARTH_RADIUS_KM, KM_PER_DEGREE_LAT, KM_PER_DEGREE_LAT
 
 
 def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """
-    Calculate the great circle distance between two points on Earth.
+    Calculate great circle distance between two points using Haversine formula.
+
+    The Haversine formula calculates the shortest distance over the earth's
+    surface, giving an "as-the-crow-flies" distance between two points
+    (ignoring any hills they fly over, of course!).
 
     Args:
         lat1: Latitude of first point in degrees
@@ -36,6 +40,79 @@ def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
     return EARTH_RADIUS_KM * c
+
+
+def perpendicular_distance(lat: float, lon: float, line) -> float:
+        """
+        Calculate perpendicular distance from point to line.
+
+        Uses cross product formula to find the shortest distance
+        from a point to a line segment. This is an approximation
+        that works well for small distances.
+
+        Args:
+            lat: Point latitude
+            lon: Point longitude
+            line: Line segment
+
+        Returns:
+            Distance in kilometers
+        """
+        # Simple approximation using cross product
+        # For small distances this is sufficiently accurate
+
+        # Vector from line start to point
+        dx1 = lon - line.start_lon
+        dy1 = lat - line.start_lat
+
+        # Vector along line
+        dx2 = line.end_lon - line.start_lon
+        dy2 = line.end_lat - line.start_lat
+
+        # Normalize line vector
+        line_length = sqrt(dx2**2 + dy2**2)
+        if line_length < 1e-10:
+            return haversine_distance(lat, lon, line.start_lat, line.start_lon)
+
+        dx2 /= line_length
+        dy2 /= line_length
+
+        # Calculate perpendicular distance (cross product magnitude)
+        cross = abs(dx1 * dy2 - dy1 * dx2)
+
+        # Convert to kilometers (approximate)
+        return cross * KM_PER_DEGREE_LAT # degrees to km
+
+
+def calculate_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+        """
+        Calculate bearing (direction) from point 1 to point 2.
+
+        Returns the initial bearing (forward azimuth) from the first
+        point to the second point. Note that the bearing may change
+        along a great circle path.
+
+        Args:
+            lat1, lon1: Start point (degrees)
+            lat2, lon2: End point (degrees)
+
+        Returns:
+            Bearing in degrees (0-360, where 0/360=North, 90=East, 180=South, 270=West)
+        """
+        lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+        dlon = lon2 - lon1
+
+        x = sin(dlon) * cos(lat2)
+        y = cos(lat1) * sin(lat2) - sin(lat1) * cos(
+            lat2
+        ) * cos(dlon)
+
+        bearing = atan2(x, y)
+        bearing = degrees(bearing)
+        bearing = (bearing + 360) % 360
+
+        return bearing
 
 
 def get_bounding_box(

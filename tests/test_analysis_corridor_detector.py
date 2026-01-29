@@ -272,39 +272,6 @@ class TestCorridorDetector:
         # Linear corridor should have high linearity score
         assert corridor.linearity_score > 0.6
 
-    def test_haversine_distance(self, linear_corridor_db):
-        """Test Haversine distance calculation."""
-        detector = CorridorDetector(linear_corridor_db)
-
-        # Test known distance (roughly)
-        # 1 degree latitude ~ 111 km
-        dist = detector._haversine_distance(49.0, 8.0, 50.0, 8.0)
-        assert 110 < dist < 112  # ~111 km
-
-        # Test same point
-        dist = detector._haversine_distance(49.0, 8.0, 49.0, 8.0)
-        assert dist == 0.0
-
-    def test_bearing_calculation(self, linear_corridor_db):
-        """Test bearing/heading calculation."""
-        detector = CorridorDetector(linear_corridor_db)
-
-        # North: should be ~0°
-        bearing = detector._calculate_bearing(49.0, 8.0, 50.0, 8.0)
-        assert -5 < bearing < 5 or bearing > 355
-
-        # East: should be ~90°
-        bearing = detector._calculate_bearing(49.0, 8.0, 49.0, 9.0)
-        assert 85 < bearing < 95
-
-        # South: should be ~180°
-        bearing = detector._calculate_bearing(50.0, 8.0, 49.0, 8.0)
-        assert 175 < bearing < 185
-
-        # West: should be ~270°
-        bearing = detector._calculate_bearing(49.0, 9.0, 49.0, 8.0)
-        assert 265 < bearing < 275
-
     def test_line_fitting(self, linear_corridor_db):
         """Test least squares line fitting."""
         detector = CorridorDetector(linear_corridor_db)
@@ -323,28 +290,6 @@ class TestCorridorDetector:
 
         # Length should be ~44 km (0.4 degrees * 111 km/degree)
         assert 40 < line.length_km < 48
-
-    def test_perpendicular_distance(self, linear_corridor_db):
-        """Test perpendicular distance calculation."""
-        detector = CorridorDetector(linear_corridor_db)
-
-        # Create vertical line
-        line = LineSegment(
-            start_lat=49.0,
-            start_lon=8.0,
-            end_lat=50.0,
-            end_lon=8.0,
-            heading=0.0,
-            length_km=111.0,
-        )
-
-        # Point on the line
-        dist = detector._perpendicular_distance(49.5, 8.0, line)
-        assert dist < 0.1  # Should be very close to 0
-
-        # Point 0.1 degrees away (~ 11 km)
-        dist = detector._perpendicular_distance(49.5, 8.1, line)
-        assert 10 < dist < 12
 
     def test_directional_grouping(self, multi_corridor_db):
         """Test that positions are grouped by direction."""

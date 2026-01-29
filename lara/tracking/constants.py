@@ -21,7 +21,7 @@ EARTH_RADIUS_KM = 6371
 # Conversion factors
 METERS_TO_FEET = 3.28084
 MS_TO_KMH = 3.6
-KM_PER_DEGREE_LAT = 111.0
+KM_PER_DEGREE_LAT = 111.32  # Approximate conversion at equator
 
 # Flight tracking
 FLIGHT_SESSION_TIMEOUT_MINUTES = 30
