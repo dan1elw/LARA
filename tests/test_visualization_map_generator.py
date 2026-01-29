@@ -46,6 +46,9 @@ class TestMapGenerator:
         gen = MapGenerator(49.3508, 8.1364)
 
         corridor = {
+            "heading": 90,
+            "length_km": 100,
+            "width_km": 10,
             "center_lat": 49.35,
             "center_lon": 8.14,
             "unique_flights": 50,

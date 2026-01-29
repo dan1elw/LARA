@@ -130,12 +130,6 @@ class MapGenerator:
         end_lat = corridor.get('end_lat', corridor['center_lat'])
         end_lon = corridor.get('end_lon', corridor['center_lon'])
         
-        # Fallback for old circular format
-        if start_lat == end_lat and start_lon == end_lon:
-            # Old format - draw as circle
-            self._add_circular_corridor(corridor, rank)
-            return
-        
         # Color based on rank
         color = self._get_rank_color(rank)
         
@@ -164,57 +158,6 @@ class MapGenerator:
         for line in width_lines:
             line.add_to(self.map)
         
-        # Add directional arrow at midpoint
-        mid_lat = (start_lat + end_lat) / 2
-        mid_lon = (start_lon + end_lon) / 2
-        
-        folium.CircleMarker(
-            [mid_lat, mid_lon],
-            radius=6,
-            popup=f"Corridor #{rank}",
-            color=color,
-            fill=True,
-            fillColor=color,
-            fillOpacity=0.9
-        ).add_to(self.map)
-    
-    def _add_circular_corridor(self, corridor: Dict[str, Any], rank: int):
-        """
-        Add corridor in old circular format (fallback for compatibility).
-        
-        Args:
-            corridor: Corridor with center point
-            rank: Corridor rank
-        """
-        lat = corridor['center_lat']
-        lon = corridor['center_lon']
-        
-        # Size based on traffic volume
-        radius = min(corridor['unique_flights'] * 100, 5000)  # Max 5km
-        
-        # Color based on rank
-        color = self._get_rank_color(rank)
-        
-        popup_html = f"""
-        <b>Corridor #{rank}</b><br>
-        <b>Flights:</b> {corridor['unique_flights']}<br>
-        <b>Positions:</b> {corridor['total_positions']}<br>
-        <b>Avg Altitude:</b> {corridor.get('avg_altitude_m', 0):.0f} m<br>
-        <b>Avg Heading:</b> {corridor.get('avg_heading', 0):.0f}°
-        """
-        
-        folium.Circle(
-            radius=radius,
-            location=[lat, lon],
-            popup=popup_html,
-            tooltip=f"Corridor #{rank}",
-            color=color,
-            fill=True,
-            fillColor=color,
-            fillOpacity=0.3,
-            weight=2
-        ).add_to(self.map)
-    
     def _create_corridor_popup(self, corridor: Dict[str, Any], rank: int) -> str:
         """
         Create HTML popup for corridor visualization.
@@ -331,29 +274,6 @@ class MapGenerator:
         lines.append(line2)
         
         return lines
-    
-    def add_position_markers(self, positions: List[Dict[str, Any]]):
-        """
-        Add individual position markers to the map.
-        
-        Args:
-            positions: List of position dictionaries
-        """
-        marker_cluster = plugins.MarkerCluster().add_to(self.map)
-        
-        for pos in positions:
-            if not pos.get('latitude') or not pos.get('longitude'):
-                continue
-            
-            altitude = pos.get('altitude_m', 0)
-            color = self._get_altitude_color(altitude)
-            
-            popup_html = f"""
-            <b>Altitude:</b> {altitude:.0f} m<br>
-            <b>Speed:</b> {pos.get('velocity_ms', 0) * 3.6:.1f} km/h<br>
-            <b>Heading:</b> {pos.get('heading', 0):.0f}°<br>
-            <b>Distance:</b> {pos.get('distance_from_home_km', 0):.2f} km
-            """
     
     def _get_altitude_color(self, altitude_m: float) -> str:
         """
