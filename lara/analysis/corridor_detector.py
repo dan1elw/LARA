@@ -1,732 +1,644 @@
-# """
-# Flight Corridor Detection
-# Identifies bidirectional flight corridors (routes used in both directions).
-# """
-
-# from typing import Dict, Any, List, Tuple
-# from collections import defaultdict
-# import math
-
-# from .constants import MIN_CORRIDOR_FLIGHTS, DEFAULT_GRID_SIZE_KM, MIN_POSITIONS_FOR_CORRIDOR
-
-
-# class CorridorDetector:
-#     """
-#     Detects bidirectional flight corridors using spatial clustering.
-    
-#     A corridor is defined as a spatial route used by aircraft, regardless
-#     of direction. Flights going opposite directions on the same route are
-#     grouped together.
-#     """
-    
-#     def __init__(self, db_conn):
-#         """
-#         Initialize corridor detector.
-        
-#         Args:
-#             db_conn: SQLite database connection
-#         """
-#         self.conn = db_conn
-    
-#     def detect_corridors(self, min_flights: int = MIN_CORRIDOR_FLIGHTS,
-#                         position_tolerance_km: float = DEFAULT_GRID_SIZE_KM,
-#                         min_positions: int = MIN_POSITIONS_FOR_CORRIDOR) -> Dict[str, Any]:
-#         """
-#         Detect bidirectional flight corridors using spatial density clustering.
-        
-#         Args:
-#             min_flights: Minimum number of unique flights for a corridor
-#             position_tolerance_km: Spatial tolerance in km for grouping positions
-#             min_positions: Minimum positions per flight to consider
-        
-#         Returns:
-#             Dictionary with corridor data
-#         """
-#         print(f"🔍 Detecting bidirectional flight corridors...")
-#         print(f"   Position tolerance: {position_tolerance_km} km")
-#         print(f"   Minimum flights: {min_flights}")
-        
-#         # Get ALL positions (not grouped by flight initially)
-#         all_positions = self._get_all_positions(min_positions_per_flight=min_positions)
-        
-#         if not all_positions:
-#             print("   No position data available")
-#             return {'total_corridors': 0, 'corridors': []}
-        
-#         print(f"   Processing {len(all_positions)} total positions...")
-        
-#         # Grid-based spatial clustering (simpler and faster)
-#         grid_clusters = self._cluster_positions_by_grid(
-#             all_positions, 
-#             grid_size_km=position_tolerance_km
-#         )
-#         print(grid_clusters)
-        
-#         print(f"   Found {len(grid_clusters)} spatial clusters")
-        
-#         # Build corridors from clusters
-#         corridors = []
-#         for cluster_id, cluster_positions in enumerate(grid_clusters, 1):
-#             # Get unique flights in this cluster
-#             unique_flights = len(set(p['flight_id'] for p in cluster_positions))
-            
-#             if unique_flights < min_flights:
-#                 continue
-            
-#             corridor = self._build_corridor_from_positions(cluster_positions, cluster_id)
-#             if corridor:
-#                 corridors.append(corridor)
-        
-#         # Sort by traffic volume
-#         corridors.sort(key=lambda x: x['unique_flights'], reverse=True)
-        
-#         # Update ranks
-#         for i, corridor in enumerate(corridors, 1):
-#             corridor['rank'] = i
-        
-#         print(f"✅ Found {len(corridors)} flight corridors (bidirectional)")
-        
-#         # Display top corridors
-#         for corridor in corridors[:10]:
-#             print(f"  #{corridor['rank']}: {corridor['unique_flights']} flights, "
-#                   f"{corridor['total_positions']} positions, "
-#                   f"Alt: {corridor['avg_altitude']:.0f}m")
-        
-#         return {
-#             'total_corridors': len(corridors),
-#             'corridors': corridors
-#         }
-    
-#     def _get_all_positions(self, min_positions_per_flight: int = 10) -> List[Dict]:
-#         """
-#         Get all positions from all flights.
-        
-#         Args:
-#             min_positions_per_flight: Filter out flights with too few positions
-        
-#         Returns:
-#             List of position dictionaries
-#         """
-#         cursor = self.conn.cursor()
-        
-#         # First, get flights with enough positions
-#         cursor.execute('''
-#             SELECT flight_id, COUNT(*) as position_count
-#             FROM positions
-#             WHERE latitude IS NOT NULL AND longitude IS NOT NULL
-#             GROUP BY flight_id
-#             HAVING position_count >= ?
-#         ''', (min_positions_per_flight,))
-        
-#         valid_flight_ids = [row['flight_id'] for row in cursor.fetchall()]
-        
-#         if not valid_flight_ids:
-#             return []
-        
-#         # Get all positions from valid flights
-#         placeholders = ','.join('?' * len(valid_flight_ids))
-#         cursor.execute(f'''
-#             SELECT 
-#                 p.flight_id,
-#                 p.latitude,
-#                 p.longitude,
-#                 p.altitude_m,
-#                 p.heading,
-#                 f.callsign
-#             FROM positions p
-#             JOIN flights f ON p.flight_id = f.id
-#             WHERE p.flight_id IN ({placeholders})
-#             AND p.latitude IS NOT NULL 
-#             AND p.longitude IS NOT NULL
-#         ''', valid_flight_ids)
-        
-#         positions = []
-#         for row in cursor.fetchall():
-#             positions.append({
-#                 'flight_id': row['flight_id'],
-#                 'lat': row['latitude'],
-#                 'lon': row['longitude'],
-#                 'alt': row['altitude_m'],
-#                 'heading': row['heading'],
-#                 'callsign': row['callsign']
-#             })
-        
-#         return positions
-    
-#     def _cluster_positions_by_grid(self, positions: List[Dict], 
-#                                    grid_size_km: float) -> List[List[Dict]]:
-#         """
-#         Cluster positions using a spatial grid.
-        
-#         Args:
-#             positions: List of position dictionaries
-#             grid_size_km: Grid cell size in kilometers
-        
-#         Returns:
-#             List of position clusters
-#         """
-#         # Create grid cells
-#         grid_deg = grid_size_km / 111.0  # Approximate conversion
-#         grid = defaultdict(list)
-        
-#         for pos in positions:
-#             # Assign to grid cell
-#             grid_lat = round(pos['lat'] / grid_deg) * grid_deg
-#             grid_lon = round(pos['lon'] / grid_deg) * grid_deg
-#             cell_key = (grid_lat, grid_lon)
-#             grid[cell_key].append(pos)
-        
-#         # Merge adjacent cells to form larger clusters
-#         clusters = []
-#         processed_cells = set()
-        
-#         for cell_key, cell_positions in grid.items():
-#             if cell_key in processed_cells:
-#                 continue
-            
-#             # Start a new cluster
-#             cluster = list(cell_positions)
-#             to_process = [cell_key]
-#             processed_cells.add(cell_key)
-            
-#             # Expand cluster by checking neighbors
-#             while to_process:
-#                 current_cell = to_process.pop()
-#                 current_lat, current_lon = current_cell
-                
-#                 # Check 8 neighbors
-#                 for dlat in [-grid_deg, 0, grid_deg]:
-#                     for dlon in [-grid_deg, 0, grid_deg]:
-#                         if dlat == 0 and dlon == 0:
-#                             continue
-                        
-#                         neighbor_key = (current_lat + dlat, current_lon + dlon)
-                        
-#                         if neighbor_key in grid and neighbor_key not in processed_cells:
-#                             cluster.extend(grid[neighbor_key])
-#                             processed_cells.add(neighbor_key)
-#                             to_process.append(neighbor_key)
-            
-#             if cluster:
-#                 clusters.append(cluster)
-        
-#         return clusters
-    
-#     def _build_corridor_from_positions(self, positions: List[Dict], 
-#                                       cluster_id: int) -> Dict[str, Any]:
-#         """
-#         Build corridor object from clustered positions.
-        
-#         Args:
-#             positions: List of position dictionaries
-#             cluster_id: Cluster identifier
-        
-#         Returns:
-#             Corridor dictionary or None
-#         """
-#         if not positions:
-#             return None
-        
-#         # Get unique flights
-#         unique_flights = set(p['flight_id'] for p in positions)
-        
-#         # Calculate corridor centerline using density-based path
-#         corridor_points = self._calculate_corridor_path(positions)
-        
-#         if not corridor_points or len(corridor_points) < 2:
-#             return None
-        
-#         # Calculate average altitude
-#         altitudes = [p['alt'] for p in positions if p['alt']]
-#         avg_altitude = sum(altitudes) / len(altitudes) if altitudes else 0
-        
-#         # Get sample callsigns
-#         callsigns = list(set(p['callsign'] for p in positions if p['callsign']))
-        
-#         return {
-#             'rank': cluster_id,
-#             'unique_flights': len(unique_flights),
-#             'total_positions': len(positions),
-#             'avg_altitude': avg_altitude,
-#             'corridor_points': corridor_points,
-#             'start_point': corridor_points[0] if corridor_points else None,
-#             'end_point': corridor_points[-1] if corridor_points else None,
-#             'sample_callsigns': callsigns[:5]
-#         }
-    
-#     def _calculate_corridor_path(self, positions: List[Dict]) -> List[Tuple[float, float]]:
-#         """
-#         Calculate the main path through a cluster of positions.
-        
-#         Uses Principal Component Analysis (PCA) approach to find the main axis.
-        
-#         Args:
-#             positions: List of position dictionaries
-        
-#         Returns:
-#             List of (lat, lon) tuples defining the corridor path
-#         """
-#         if not positions:
-#             return []
-        
-#         # Extract coordinates
-#         coords = [(p['lat'], p['lon']) for p in positions]
-        
-#         # Calculate mean center
-#         mean_lat = sum(c[0] for c in coords) / len(coords)
-#         mean_lon = sum(c[1] for c in coords) / len(coords)
-        
-#         # Center the data
-#         centered = [(lat - mean_lat, lon - mean_lon) for lat, lon in coords]
-        
-#         # Calculate covariance matrix components
-#         cov_lat_lat = sum(lat * lat for lat, lon in centered) / len(centered)
-#         cov_lon_lon = sum(lon * lon for lat, lon in centered) / len(centered)
-#         cov_lat_lon = sum(lat * lon for lat, lon in centered) / len(centered)
-        
-#         # Find principal axis (eigenvector of largest eigenvalue)
-#         # For 2D, we can solve this directly
-#         trace = cov_lat_lat + cov_lon_lon
-#         det = cov_lat_lat * cov_lon_lon - cov_lat_lon * cov_lat_lon
-        
-#         # Eigenvalues
-#         lambda1 = trace / 2 + math.sqrt(trace * trace / 4 - det)
-        
-#         # Eigenvector for lambda1
-#         if abs(cov_lat_lon) > 1e-10:
-#             v_lat = lambda1 - cov_lon_lon
-#             v_lon = cov_lat_lon
-#         else:
-#             v_lat = 1
-#             v_lon = 0
-        
-#         # Normalize
-#         length = math.sqrt(v_lat * v_lat + v_lon * v_lon)
-#         if length > 0:
-#             v_lat /= length
-#             v_lon /= length
-        
-#         # Project all points onto the principal axis
-#         projections = []
-#         for lat, lon in centered:
-#             projection = lat * v_lat + lon * v_lon
-#             projections.append(projection)
-        
-#         # Find extent along the axis
-#         min_proj = min(projections)
-#         max_proj = max(projections)
-        
-#         # Create path points along the principal axis
-#         num_points = 30
-#         path_points = []
-        
-#         for i in range(num_points + 1):
-#             t = i / num_points
-#             proj = min_proj + t * (max_proj - min_proj)
-            
-#             # Convert back to lat/lon
-#             lat = mean_lat + proj * v_lat
-#             lon = mean_lon + proj * v_lon
-#             path_points.append((lat, lon))
-        
-#         return path_points
-    
-#     def _haversine_distance(self, lat1: float, lon1: float, 
-#                            lat2: float, lon2: float) -> float:
-#         """Calculate distance in km."""
-#         R = 6371
-#         lat1_rad = math.radians(lat1)
-#         lat2_rad = math.radians(lat2)
-#         dlat = math.radians(lat2 - lat1)
-#         dlon = math.radians(lon2 - lon1)
-        
-#         a = math.sin(dlat/2)**2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon/2)**2
-#         c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-        
-#         return R * c
-
 """
 Flight Corridor Detection
-Identifies linear flight corridors using trajectory clustering.
+Identifies common linear flight paths using directional clustering and path analysis.
+
+This module detects flight corridors by:
+1. Grouping flight segments by direction (heading) and spatial proximity
+2. Fitting linear corridors to grouped segments
+3. Validating corridor quality (linearity, consistency)
+4. Ranking corridors by usage (unique flights)
+
+A corridor is defined as a linear path segment where multiple flights follow
+similar routes in the same general direction.
 """
 
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional, NamedTuple
+from dataclasses import dataclass
 from collections import defaultdict
 import math
-import numpy as np
-from sklearn.cluster import DBSCAN
-from scipy.spatial import distance
+
+# Type alias for database row (since we can't import sqlite3.Row type)
+DbRow = Any
 
 
-from .constants import DEFAULT_GRID_SIZE_KM, MIN_CORRIDOR_FLIGHTS
+@dataclass
+class Position:
+    """Represents a single position point from a flight."""
+
+    latitude: float
+    longitude: float
+    altitude_m: Optional[float]
+    heading: Optional[float]
+    flight_id: int
+    callsign: Optional[str]
+
+
+@dataclass
+class LineSegment:
+    """Represents a fitted line segment (potential corridor)."""
+
+    start_lat: float
+    start_lon: float
+    end_lat: float
+    end_lon: float
+    heading: float
+    length_km: float
+
+    def midpoint(self) -> Tuple[float, float]:
+        """Calculate midpoint of line segment."""
+        return (
+            (self.start_lat + self.end_lat) / 2,
+            (self.start_lon + self.end_lon) / 2,
+        )
+
+
+@dataclass
+class Corridor:
+    """Represents a detected flight corridor."""
+
+    rank: int
+    center_lat: float
+    center_lon: float
+    heading: float
+    length_km: float
+    width_km: float
+    unique_flights: int
+    total_positions: int
+    avg_altitude_m: float
+    linearity_score: float  # 0-1, higher is more linear
+    start_lat: float
+    start_lon: float
+    end_lat: float
+    end_lon: float
 
 
 class CorridorDetector:
     """
-    Detects linear flight corridors using trajectory-based clustering.
-    
-    A corridor is defined as a common linear route taken by multiple aircraft,
-    identified by clustering flight paths based on their spatial similarity
-    and dominant direction.
+    Detects common flight corridors using directional clustering and path fitting.
+
+    Algorithm:
+    1. Load all position data with heading information
+    2. Group positions into directional segments (similar heading, close proximity)
+    3. For each segment group, fit a linear corridor
+    4. Validate corridor quality (linearity, consistency)
+    5. Rank corridors by unique flight count
+
+    Configuration:
+        HEADING_TOLERANCE_DEG: Positions within ±30° are considered same direction
+        PROXIMITY_THRESHOLD_KM: Positions within 2km can belong to same corridor
+        MIN_CORRIDOR_LENGTH_KM: Minimum corridor length to be valid
+        MIN_LINEARITY_SCORE: Minimum linearity score (0-1) for quality filter
     """
-    
-    def __init__(self, db_conn):
+
+    # Configuration constants
+    HEADING_TOLERANCE_DEG: float = 30.0  # Positions within ±30° are same direction
+    PROXIMITY_THRESHOLD_KM: float = (
+        10.0  # Positions within 10km can belong to same corridor
+    )
+    MIN_CORRIDOR_LENGTH_KM: float = 3.0  # Minimum corridor length (lowered to 3km)
+    MIN_LINEARITY_SCORE: float = 0.5  # Minimum linearity (0-1, lowered to 0.5)
+
+    def __init__(self, db_conn: Any) -> None:
         """
         Initialize corridor detector.
-        
+
         Args:
-            db_conn: SQLite database connection
+            db_conn: SQLite database connection with row_factory set
         """
         self.conn = db_conn
-    
-    def detect_corridors(self, min_flights: int = MIN_CORRIDOR_FLIGHTS,
-                        direction_tolerance: float = 10.0) -> Dict[str, Any]:
+
+    def detect_corridors(
+        self,
+        min_flights: int = 10,
+        heading_tolerance: float = HEADING_TOLERANCE_DEG,
+        proximity_km: float = PROXIMITY_THRESHOLD_KM,
+    ) -> Dict[str, Any]:
         """
-        Detect linear flight corridors using trajectory clustering.
-        
+        Detect flight corridors using directional path analysis.
+
+        This method:
+        1. Loads position data with heading information
+        2. Groups positions by direction and proximity
+        3. Fits linear corridors to each group
+        4. Filters by quality metrics (linearity, length)
+        5. Ranks corridors by unique flight count
+
         Args:
-            min_flights: Minimum number of unique flights for a corridor
-            direction_tolerance: Angular tolerance in degrees for grouping similar directions
-        
+            min_flights: Minimum unique flights to qualify as corridor (default: 10)
+            heading_tolerance: Heading tolerance in degrees ± (default: 30°)
+            proximity_km: Maximum distance for positions to group in km (default: 2km)
+
         Returns:
-            Dictionary with corridor data including start/end points and directions
+            Dictionary containing:
+                - total_corridors: Number of detected corridors
+                - corridors: List of corridor dictionaries (top 50)
+                - parameters: Detection parameters used
+
+        Example:
+            >>> detector = CorridorDetector(db_conn)
+            >>> result = detector.detect_corridors(min_flights=5)
+            >>> print(f"Found {result['total_corridors']} corridors")
         """
-        print(f"🔍 Detecting linear flight corridors...")
-        
-        # Step 1: Get all flight trajectories
-        trajectories = self._get_flight_trajectories()
-        
-        if not trajectories:
-            print("   No flight data available for corridor detection")
+        print(f"\n🔍 Detecting flight corridors...")
+        print(
+            f"   Parameters: min_flights={min_flights}, "
+            f"heading_tolerance=±{heading_tolerance}°, proximity={proximity_km}km"
+        )
+
+        # Step 1: Load position data
+        positions = self._load_positions()
+        print(f"   Loaded {len(positions)} positions")
+
+        if len(positions) < min_flights * 2:
+            print(f"   ⚠️  Insufficient data for corridor detection")
             return {
-                'total_corridors': 0,
-                'corridors': []
+                "total_corridors": 0,
+                "corridors": [],
+                "parameters": {
+                    "min_flights": min_flights,
+                    "heading_tolerance": heading_tolerance,
+                    "proximity_km": proximity_km,
+                },
             }
-        
-        print(f"   Processing {len(trajectories)} flight trajectories...")
-        
-        # Step 2: Calculate trajectory characteristics
-        trajectory_features = []
-        trajectory_metadata = []
-        
-        for flight_id, positions in trajectories.items():
-            if len(positions) < 2:
-                continue
-            
-            # Calculate trajectory direction and center point
-            features = self._calculate_trajectory_features(positions)
-            if features:
-                trajectory_features.append(features['vector'])
-                trajectory_metadata.append({
-                    'flight_id': flight_id,
-                    'positions': positions,
-                    'center_lat': features['center_lat'],
-                    'center_lon': features['center_lon'],
-                    'heading': features['heading'],
-                    'start_point': features['start_point'],
-                    'end_point': features['end_point'],
-                    'avg_altitude': features['avg_altitude'],
-                    'callsign': features['callsign']
-                })
-        
-        if len(trajectory_features) < min_flights:
-            print(f"   Not enough trajectories ({len(trajectory_features)}) for corridor detection")
-            return {
-                'total_corridors': 0,
-                'corridors': []
-            }
-        
-        # Step 3: Cluster trajectories by spatial location and direction
-        print(f"   Clustering {len(trajectory_features)} trajectories...")
-        clusters = self._cluster_trajectories(trajectory_features, direction_tolerance)
-        
-        # Step 4: Build corridor objects from clusters
-        corridors = []
-        corridor_rank = 1
-        
-        for cluster_id in set(clusters):
-            if cluster_id == -1:  # Skip noise points
-                continue
-            
-            # Get all trajectories in this cluster
-            cluster_trajectories = [
-                trajectory_metadata[i] 
-                for i, c in enumerate(clusters) 
-                if c == cluster_id
-            ]
-            
-            if len(cluster_trajectories) < min_flights:
-                continue
-            
-            # Build corridor from clustered trajectories
-            corridor = self._build_corridor(cluster_trajectories, corridor_rank)
-            corridors.append(corridor)
-            corridor_rank += 1
-        
-        # Sort by number of flights
-        corridors.sort(key=lambda x: x['unique_flights'], reverse=True)
-        
-        # Update ranks after sorting
-        for i, corridor in enumerate(corridors, 1):
-            corridor['rank'] = i
-        
-        print(f"✅ Found {len(corridors)} flight corridors")
-        
-        # Display top corridors
-        for corridor in corridors[:5]:
-            direction = self._heading_to_cardinal(corridor['avg_heading'])
-            print(f"  #{corridor['rank']}: {corridor['unique_flights']} flights, "
-                  f"Direction: {direction} ({corridor['avg_heading']:.0f}°), "
-                  f"Alt: {corridor['avg_altitude']:.0f}m")
-        
+
+        # Step 2: Group positions by direction and proximity
+        directional_groups = self._group_by_direction_and_proximity(
+            positions, heading_tolerance, proximity_km
+        )
+        print(f"   Found {len(directional_groups)} directional groups")
+
+        # Step 3: Fit corridors to each group
+        corridors: List[Corridor] = []
+        for group_positions in directional_groups:
+            corridor = self._fit_corridor(group_positions)
+            if corridor and corridor.unique_flights >= min_flights:
+                corridors.append(corridor)
+
+        # Step 4: Filter by quality
+        quality_corridors = [
+            c
+            for c in corridors
+            if c.linearity_score >= self.MIN_LINEARITY_SCORE
+            and c.length_km >= self.MIN_CORRIDOR_LENGTH_KM
+        ]
+
+        print(
+            f"   Fitted {len(corridors)} corridors, "
+            f"{len(quality_corridors)} passed quality filters"
+        )
+
+        # Step 5: Sort and rank
+        quality_corridors.sort(key=lambda x: x.unique_flights, reverse=True)
+        for i, corridor in enumerate(quality_corridors, 1):
+            corridor.rank = i
+
+        # Display top 10
+        print(f"\n📊 Top Corridors:")
+        for corridor in quality_corridors[:10]:
+            print(
+                f"  #{corridor.rank:2d}: "
+                f"Heading {corridor.heading:>3.0f}°, "
+                f"Length {corridor.length_km:>5.1f}km, "
+                f"{corridor.unique_flights:>3d} flights, "
+                f"Linearity {corridor.linearity_score:.2f}"
+            )
+
         return {
-            'total_corridors': len(corridors),
-            'corridors': corridors
+            "total_corridors": len(quality_corridors),
+            "corridors": [self._corridor_to_dict(c) for c in quality_corridors[:50]],
+            "parameters": {
+                "min_flights": min_flights,
+                "heading_tolerance": heading_tolerance,
+                "proximity_km": proximity_km,
+                "min_linearity": self.MIN_LINEARITY_SCORE,
+                "min_length_km": self.MIN_CORRIDOR_LENGTH_KM,
+            },
         }
-    
-    def _get_flight_trajectories(self) -> Dict[int, List[Dict]]:
+
+    def _load_positions(self) -> List[Position]:
         """
-        Get all flight trajectories from database.
-        
+        Load all position data with required fields.
+
+        Loads positions that have:
+        - Valid latitude/longitude
+        - Valid heading information
+        - Associated flight information
+
         Returns:
-            Dictionary mapping flight_id to list of positions
+            List of Position objects
         """
         cursor = self.conn.cursor()
-        
-        cursor.execute('''
+
+        cursor.execute("""
             SELECT 
-                p.flight_id,
-                p.latitude,
-                p.longitude,
+                p.latitude, 
+                p.longitude, 
                 p.altitude_m,
                 p.heading,
-                p.timestamp,
+                p.flight_id,
                 f.callsign
             FROM positions p
             JOIN flights f ON p.flight_id = f.id
             WHERE p.latitude IS NOT NULL 
             AND p.longitude IS NOT NULL
-            ORDER BY p.flight_id, p.timestamp
-        ''')
-        
-        trajectories = defaultdict(list)
-        
+            AND p.heading IS NOT NULL
+        """)
+
+        positions: List[Position] = []
         for row in cursor.fetchall():
-            trajectories[row['flight_id']].append({
-                'lat': row['latitude'],
-                'lon': row['longitude'],
-                'alt': row['altitude_m'],
-                'heading': row['heading'],
-                'timestamp': row['timestamp'],
-                'callsign': row['callsign']
-            })
-        
-        return trajectories
-    
-    def _calculate_trajectory_features(self, positions: List[Dict]) -> Dict[str, Any]:
+            positions.append(
+                Position(
+                    latitude=row["latitude"],
+                    longitude=row["longitude"],
+                    altitude_m=row["altitude_m"],
+                    heading=row["heading"],
+                    flight_id=row["flight_id"],
+                    callsign=row["callsign"],
+                )
+            )
+
+        return positions
+
+    def _group_by_direction_and_proximity(
+        self, positions: List[Position], heading_tolerance: float, proximity_km: float
+    ) -> List[List[Position]]:
         """
-        Calculate features of a trajectory for clustering.
-        
+        Group positions into directional segments.
+
+        Positions are grouped if they:
+        1. Have similar headings (within tolerance)
+        2. Are spatially close (within proximity threshold)
+
+        Algorithm:
+        1. Bin positions by heading (10° bins)
+        2. Within each bin, cluster spatially using proximity threshold
+        3. Validate heading consistency within each cluster
+
         Args:
-            positions: List of position dictionaries
-        
+            positions: All positions to group
+            heading_tolerance: Heading tolerance in degrees (±)
+            proximity_km: Maximum distance between positions in group (km)
+
         Returns:
-            Dictionary with trajectory features
+            List of position groups, each representing a potential corridor
         """
-        if len(positions) < 2:
+        # First, create heading bins (every 10 degrees)
+        heading_bins: Dict[int, List[Position]] = defaultdict(list)
+        bin_size = 10.0
+
+        for pos in positions:
+            if pos.heading is None:
+                continue
+            bin_idx = int(pos.heading / bin_size)
+            heading_bins[bin_idx].append(pos)
+
+        # Now cluster spatially within each heading bin
+        groups: List[List[Position]] = []
+
+        for bin_positions in heading_bins.values():
+            if len(bin_positions) < 3:
+                continue
+
+            # Spatial clustering using simple proximity
+            ungrouped = bin_positions.copy()
+
+            while ungrouped:
+                # Start new group with first ungrouped position
+                seed = ungrouped.pop(0)
+                group = [seed]
+
+                # Find all positions close to this group
+                i = 0
+                while i < len(ungrouped):
+                    pos = ungrouped[i]
+
+                    # Check if close to any position in current group
+                    is_close = any(
+                        self._haversine_distance(
+                            pos.latitude, pos.longitude, g.latitude, g.longitude
+                        )
+                        < proximity_km
+                        for g in group
+                    )
+
+                    # Check heading similarity
+                    heading_diff = min(
+                        abs(pos.heading - seed.heading),
+                        360 - abs(pos.heading - seed.heading),
+                    )
+
+                    if is_close and heading_diff < heading_tolerance:
+                        group.append(ungrouped.pop(i))
+                    else:
+                        i += 1
+
+                if len(group) >= 3:  # Minimum 3 positions for a group
+                    groups.append(group)
+
+        return groups
+
+    def _fit_corridor(self, positions: List[Position]) -> Optional[Corridor]:
+        """
+        Fit a linear corridor to a group of positions.
+
+        Uses least-squares line fitting to find the best linear corridor
+        through the position group. Calculates corridor metrics including:
+        - Center point
+        - Heading/direction
+        - Length and width
+        - Linearity score (how well positions fit the line)
+        - Unique flight count
+
+        Args:
+            positions: Group of positions to fit
+
+        Returns:
+            Corridor object or None if fitting fails
+        """
+        if len(positions) < 3:
             return None
-        
-        # Start and end points
-        start = positions[0]
-        end = positions[-1]
-        
-        # Calculate center point
-        center_lat = sum(p['lat'] for p in positions) / len(positions)
-        center_lon = sum(p['lon'] for p in positions) / len(positions)
-        
-        # Calculate overall heading (from start to end)
-        heading = self._calculate_bearing(
-            start['lat'], start['lon'],
-            end['lat'], end['lon']
-        )
-        
-        # Average altitude
-        altitudes = [p['alt'] for p in positions if p['alt']]
-        avg_altitude = sum(altitudes) / len(altitudes) if altitudes else 0
-        
-        # Create feature vector: [center_lat, center_lon, heading_x, heading_y]
-        # Use heading components for directional clustering
-        heading_rad = math.radians(heading)
-        heading_x = math.cos(heading_rad)
-        heading_y = math.sin(heading_rad)
-        
-        return {
-            'vector': [center_lat, center_lon, heading_x * 10, heading_y * 10],  # Scale heading for clustering
-            'center_lat': center_lat,
-            'center_lon': center_lon,
-            'heading': heading,
-            'start_point': (start['lat'], start['lon']),
-            'end_point': (end['lat'], end['lon']),
-            'avg_altitude': avg_altitude,
-            'callsign': positions[0]['callsign']
-        }
-    
-    def _cluster_trajectories(self, features: List[List[float]], 
-                             direction_tolerance: float) -> List[int]:
-        """
-        Cluster trajectories using DBSCAN.
-        
-        Args:
-            features: List of feature vectors
-            direction_tolerance: Angular tolerance for clustering
-        
-        Returns:
-            List of cluster labels
-        """
-        # Convert to numpy array
-        X = np.array(features)
-        
-        # Normalize features for better clustering
-        # Position features (lat, lon) and direction features (heading_x, heading_y)
-        from sklearn.preprocessing import StandardScaler
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(X)
-        
-        # DBSCAN clustering
-        # eps: maximum distance between two samples for one to be considered in the neighborhood
-        # min_samples: minimum number of samples in a neighborhood for a point to be core
-        clustering = DBSCAN(
-            eps=0.5,  # Adjust based on your data scale
-            min_samples=3,
-            metric='euclidean'
-        )
-        
-        labels = clustering.fit_predict(X_scaled)
-        
-        return labels.tolist()
-    
-    def _build_corridor(self, trajectories: List[Dict], rank: int) -> Dict[str, Any]:
-        """
-        Build corridor object from clustered trajectories.
-        
-        Args:
-            trajectories: List of trajectory metadata dictionaries
-            rank: Corridor rank
-        
-        Returns:
-            Corridor dictionary
-        """
-        # Collect all positions from all flights in corridor
-        all_positions = []
-        for traj in trajectories:
-            all_positions.extend(traj['positions'])
-        
-        # Calculate corridor centerline (simplified - use average of all points)
-        # In production, you might want to use more sophisticated path averaging
-        corridor_points = self._calculate_corridor_centerline(trajectories)
-        
-        # Calculate average heading
-        headings = [t['heading'] for t in trajectories]
-        avg_heading = self._circular_mean(headings)
-        
-        # Calculate average altitude
-        altitudes = [t['avg_altitude'] for t in trajectories if t['avg_altitude']]
-        avg_altitude = sum(altitudes) / len(altitudes) if altitudes else 0
-        
-        # Get unique callsigns
-        callsigns = list(set(t['callsign'] for t in trajectories if t['callsign']))
-        
-        return {
-            'rank': rank,
-            'unique_flights': len(trajectories),
-            'total_positions': len(all_positions),
-            'avg_heading': avg_heading,
-            'avg_altitude': avg_altitude,
-            'corridor_points': corridor_points,  # List of (lat, lon) defining the path
-            'start_point': corridor_points[0] if corridor_points else None,
-            'end_point': corridor_points[-1] if corridor_points else None,
-            'sample_callsigns': callsigns[:5],  # First 5 callsigns as examples
-            'direction': self._heading_to_cardinal(avg_heading)
-        }
-    
-    def _calculate_corridor_centerline(self, trajectories: List[Dict]) -> List[Tuple[float, float]]:
-        """
-        Calculate centerline of corridor by averaging trajectory positions.
-        
-        Args:
-            trajectories: List of trajectory dictionaries
-        
-        Returns:
-            List of (lat, lon) tuples defining corridor centerline
-        """
-        # Simple approach: collect all start and end points, then create a line
-        start_points = [t['start_point'] for t in trajectories]
-        end_points = [t['end_point'] for t in trajectories]
-        
-        # Average start point
-        avg_start_lat = sum(p[0] for p in start_points) / len(start_points)
-        avg_start_lon = sum(p[1] for p in start_points) / len(start_points)
-        
-        # Average end point
-        avg_end_lat = sum(p[0] for p in end_points) / len(end_points)
-        avg_end_lon = sum(p[1] for p in end_points) / len(end_points)
-        
-        # Create intermediate points for smoother visualization
-        points = []
-        num_segments = 10
-        for i in range(num_segments + 1):
-            t = i / num_segments
-            lat = avg_start_lat + t * (avg_end_lat - avg_start_lat)
-            lon = avg_start_lon + t * (avg_end_lon - avg_start_lon)
-            points.append((lat, lon))
-        
-        return points
-    
-    def _calculate_bearing(self, lat1: float, lon1: float, 
-                          lat2: float, lon2: float) -> float:
-        """
-        Calculate bearing between two points.
-        
-        Returns:
-            Bearing in degrees (0-360)
-        """
-        lat1_rad = math.radians(lat1)
-        lat2_rad = math.radians(lat2)
-        dlon_rad = math.radians(lon2 - lon1)
-        
-        y = math.sin(dlon_rad) * math.cos(lat2_rad)
-        x = math.cos(lat1_rad) * math.sin(lat2_rad) - \
-            math.sin(lat1_rad) * math.cos(lat2_rad) * math.cos(dlon_rad)
-        
-        bearing_rad = math.atan2(y, x)
-        bearing_deg = math.degrees(bearing_rad)
-        
-        return (bearing_deg + 360) % 360
-    
-    def _circular_mean(self, angles: List[float]) -> float:
-        """Calculate circular mean for headings (0-360°)."""
-        if not angles:
+
+        # Extract coordinates
+        lats = [p.latitude for p in positions]
+        lons = [p.longitude for p in positions]
+        alts = [p.altitude_m for p in positions if p.altitude_m is not None]
+
+        # Get unique flights
+        unique_flights = len(set(p.flight_id for p in positions))
+
+        # Fit line using least squares
+        line = self._fit_line_least_squares(lats, lons)
+        if line is None:
             return None
-        
-        sin_sum = sum(math.sin(math.radians(a)) for a in angles)
-        cos_sum = sum(math.cos(math.radians(a)) for a in angles)
-        
-        mean_rad = math.atan2(sin_sum, cos_sum)
-        mean_deg = math.degrees(mean_rad)
-        
-        return mean_deg if mean_deg >= 0 else mean_deg + 360
-    
-    def _heading_to_cardinal(self, heading: float) -> str:
-        """Convert heading to cardinal direction."""
-        if heading is None:
-            return "Unknown"
-        
-        directions = [
-            "N", "NNE", "NE", "ENE",
-            "E", "ESE", "SE", "SSE",
-            "S", "SSW", "SW", "WSW",
-            "W", "WNW", "NW", "NNW"
+
+        # Calculate corridor metrics
+        center_lat, center_lon = line.midpoint()
+        avg_altitude = sum(alts) / len(alts) if alts else 0.0
+
+        # Calculate perpendicular distances for width estimation
+        distances = [
+            self._perpendicular_distance(p.latitude, p.longitude, line)
+            for p in positions
         ]
-        
-        index = round(heading / 22.5) % 16
-        return directions[index]
+        width_km = 2 * (sum(distances) / len(distances))  # Average distance * 2
+
+        # Calculate linearity score (how well points fit the line)
+        max_dist = max(distances) if distances else 0.0
+        linearity = 1.0 - min(max_dist / (line.length_km / 2 + 0.001), 1.0)
+
+        return Corridor(
+            rank=0,  # Will be set later
+            center_lat=center_lat,
+            center_lon=center_lon,
+            heading=line.heading,
+            length_km=line.length_km,
+            width_km=width_km,
+            unique_flights=unique_flights,
+            total_positions=len(positions),
+            avg_altitude_m=avg_altitude,
+            linearity_score=linearity,
+            start_lat=line.start_lat,
+            start_lon=line.start_lon,
+            end_lat=line.end_lat,
+            end_lon=line.end_lon,
+        )
+
+    def _fit_line_least_squares(
+        self, lats: List[float], lons: List[float]
+    ) -> Optional[LineSegment]:
+        """
+        Fit a line to points using least squares regression.
+
+        Finds the best-fit line through a set of points using
+        the standard least squares method: minimizing the sum
+        of squared residuals.
+
+        Args:
+            lats: Latitude values
+            lons: Longitude values
+
+        Returns:
+            LineSegment or None if fitting fails
+        """
+        if len(lats) < 2:
+            return None
+
+        # Calculate means
+        mean_lat = sum(lats) / len(lats)
+        mean_lon = sum(lons) / len(lons)
+
+        # Calculate variance in each direction
+        lat_variance = sum((lat - mean_lat) ** 2 for lat in lats) / len(lats)
+        lon_variance = sum((lon - mean_lon) ** 2 for lon in lons) / len(lons)
+
+        # Determine which direction has more variation
+        # If corridor is more vertical (N-S), latitude varies more - use it as independent
+        # If corridor is more horizontal (E-W), longitude varies more - use it as independent
+        use_lat_as_independent = lat_variance > lon_variance
+
+        if use_lat_as_independent:
+            # Corridor is more N-S: fit lon = f(lat)
+            numerator = sum(
+                (lats[i] - mean_lat) * (lons[i] - mean_lon) for i in range(len(lats))
+            )
+            denominator = sum((lats[i] - mean_lat) ** 2 for i in range(len(lats)))
+
+            if abs(denominator) < 1e-10:
+                # Horizontal line
+                start_lat = mean_lat
+                end_lat = mean_lat
+                start_lon = min(lons)
+                end_lon = max(lons)
+            else:
+                slope = numerator / denominator
+                intercept = mean_lon - slope * mean_lat
+
+                # Use min/max latitude for endpoints
+                min_lat = min(lats)
+                max_lat = max(lats)
+                start_lat = min_lat
+                end_lat = max_lat
+                start_lon = slope * min_lat + intercept
+                end_lon = slope * max_lat + intercept
+        else:
+            # Corridor is more E-W: fit lat = f(lon)
+            numerator = sum(
+                (lons[i] - mean_lon) * (lats[i] - mean_lat) for i in range(len(lats))
+            )
+            denominator = sum((lons[i] - mean_lon) ** 2 for i in range(len(lons)))
+
+            if abs(denominator) < 1e-10:
+                # Vertical line
+                start_lat = min(lats)
+                end_lat = max(lats)
+                start_lon = mean_lon
+                end_lon = mean_lon
+            else:
+                slope = numerator / denominator
+                intercept = mean_lat - slope * mean_lon
+
+                # Use min/max longitude for endpoints
+                min_lon = min(lons)
+                max_lon = max(lons)
+                start_lon = min_lon
+                end_lon = max_lon
+                start_lat = slope * min_lon + intercept
+                end_lat = slope * max_lon + intercept
+
+        # Calculate heading
+        heading = self._calculate_bearing(start_lat, start_lon, end_lat, end_lon)
+
+        # Calculate length
+        length = self._haversine_distance(start_lat, start_lon, end_lat, end_lon)
+
+        return LineSegment(
+            start_lat=start_lat,
+            start_lon=start_lon,
+            end_lat=end_lat,
+            end_lon=end_lon,
+            heading=heading,
+            length_km=length,
+        )
+
+    def _perpendicular_distance(
+        self, lat: float, lon: float, line: LineSegment
+    ) -> float:
+        """
+        Calculate perpendicular distance from point to line.
+
+        Uses cross product formula to find the shortest distance
+        from a point to a line segment. This is an approximation
+        that works well for small distances.
+
+        Args:
+            lat: Point latitude
+            lon: Point longitude
+            line: Line segment
+
+        Returns:
+            Distance in kilometers
+        """
+        # Simple approximation using cross product
+        # For small distances this is sufficiently accurate
+
+        # Vector from line start to point
+        dx1 = lon - line.start_lon
+        dy1 = lat - line.start_lat
+
+        # Vector along line
+        dx2 = line.end_lon - line.start_lon
+        dy2 = line.end_lat - line.start_lat
+
+        # Normalize line vector
+        line_length = math.sqrt(dx2**2 + dy2**2)
+        if line_length < 1e-10:
+            return self._haversine_distance(lat, lon, line.start_lat, line.start_lon)
+
+        dx2 /= line_length
+        dy2 /= line_length
+
+        # Calculate perpendicular distance (cross product magnitude)
+        cross = abs(dx1 * dy2 - dy1 * dx2)
+
+        # Convert to kilometers (approximate)
+        return cross * 111.0  # degrees to km
+
+    def _haversine_distance(
+        self, lat1: float, lon1: float, lat2: float, lon2: float
+    ) -> float:
+        """
+        Calculate great circle distance between two points using Haversine formula.
+
+        The Haversine formula calculates the shortest distance over the earth's
+        surface, giving an "as-the-crow-flies" distance between two points
+        (ignoring any hills they fly over, of course!).
+
+        Args:
+            lat1, lon1: First point coordinates (degrees)
+            lat2, lon2: Second point coordinates (degrees)
+
+        Returns:
+            Distance in kilometers
+
+        Example:
+            >>> distance = self._haversine_distance(49.35, 8.14, 49.36, 8.15)
+            >>> print(f"{distance:.2f} km")
+        """
+        R = 6371  # Earth radius in km
+
+        lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+
+        a = (
+            math.sin(dlat / 2) ** 2
+            + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
+        )
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+        return R * c
+
+    def _calculate_bearing(
+        self, lat1: float, lon1: float, lat2: float, lon2: float
+    ) -> float:
+        """
+        Calculate bearing (direction) from point 1 to point 2.
+
+        Returns the initial bearing (forward azimuth) from the first
+        point to the second point. Note that the bearing may change
+        along a great circle path.
+
+        Args:
+            lat1, lon1: Start point (degrees)
+            lat2, lon2: End point (degrees)
+
+        Returns:
+            Bearing in degrees (0-360, where 0/360=North, 90=East, 180=South, 270=West)
+        """
+        lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+
+        dlon = lon2 - lon1
+
+        x = math.sin(dlon) * math.cos(lat2)
+        y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(
+            lat2
+        ) * math.cos(dlon)
+
+        bearing = math.atan2(x, y)
+        bearing = math.degrees(bearing)
+        bearing = (bearing + 360) % 360
+
+        return bearing
+
+    def _corridor_to_dict(self, corridor: Corridor) -> Dict[str, Any]:
+        """
+        Convert Corridor object to dictionary for serialization.
+
+        Creates a dictionary representation suitable for JSON serialization
+        and API responses.
+
+        Args:
+            corridor: Corridor object
+
+        Returns:
+            Dictionary representation with all corridor attributes
+        """
+        return {
+            "rank": corridor.rank,
+            "center_lat": corridor.center_lat,
+            "center_lon": corridor.center_lon,
+            "heading": corridor.heading,
+            "length_km": corridor.length_km,
+            "width_km": corridor.width_km,
+            "unique_flights": corridor.unique_flights,
+            "total_positions": corridor.total_positions,
+            "avg_altitude_m": corridor.avg_altitude_m,
+            "linearity_score": corridor.linearity_score,
+            "start_lat": corridor.start_lat,
+            "start_lon": corridor.start_lon,
+            "end_lat": corridor.end_lat,
+            "end_lon": corridor.end_lon,
+            # Legacy field for compatibility
+            "avg_heading": corridor.heading,
+        }
