@@ -6,20 +6,15 @@ Updated to properly visualize linear flight corridors instead of circular cluste
 """
 
 import folium
-from folium import plugins
-from typing import Dict, Any, List, Tuple, Optional
-import json
+from typing import Dict, Any, List
 
 from .constants import (
     DEFAULT_MAP_STYLE,
     DEFAULT_ZOOM,
     MAP_TILE_URLS,
     ALTITUDE_COLORS,
-    FLIGHT_PATH_COLOR,
     FLIGHT_PATH_WEIGHT,
     FLIGHT_PATH_OPACITY,
-    MARKER_RADIUS,
-    MARKER_OPACITY,
 )
 
 

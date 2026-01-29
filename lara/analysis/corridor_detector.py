@@ -12,7 +12,7 @@ A corridor is defined as a linear path segment where multiple flights follow
 similar routes in the same general direction.
 """
 
-from typing import Dict, Any, List, Tuple, Optional, NamedTuple
+from typing import Dict, Any, List, Tuple, Optional
 from dataclasses import dataclass
 from collections import defaultdict
 import math
@@ -139,7 +139,7 @@ class CorridorDetector:
             >>> result = detector.detect_corridors(min_flights=5)
             >>> print(f"Found {result['total_corridors']} corridors")
         """
-        print(f"\n🔍 Detecting flight corridors...")
+        print("\n🔍 Detecting flight corridors...")
         print(
             f"   Parameters: min_flights={min_flights}, "
             f"heading_tolerance=±{heading_tolerance}°, proximity={proximity_km}km"
@@ -150,7 +150,7 @@ class CorridorDetector:
         print(f"   Loaded {len(positions)} positions")
 
         if len(positions) < min_flights * 2:
-            print(f"   ⚠️  Insufficient data for corridor detection")
+            print("   ⚠️  Insufficient data for corridor detection")
             return {
                 "total_corridors": 0,
                 "corridors": [],
@@ -193,7 +193,7 @@ class CorridorDetector:
             corridor.rank = i
 
         # Display top 10
-        print(f"\n📊 Top Corridors:")
+        print("\n📊 Top Corridors:")
         for corridor in quality_corridors[:10]:
             print(
                 f"  #{corridor.rank:2d}: "

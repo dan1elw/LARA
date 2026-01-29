@@ -99,7 +99,7 @@ def linear_corridor_db():
     conn.close()
     try:
         os.unlink(db_path)
-    except:
+    except Exception:
         pass
 
 
@@ -182,7 +182,7 @@ def multi_corridor_db():
     conn.close()
     try:
         os.unlink(db_path)
-    except:
+    except Exception:
         pass
 
 
