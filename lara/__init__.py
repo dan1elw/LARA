@@ -1,7 +1,7 @@
 """
 LARA - Local Air Route Analysis
 
-A comprehensive system for tracking, analyzing, and visualizing aircraft 
+A comprehensive system for tracking, analyzing, and visualizing aircraft
 flight routes over your location using ADS-B data from OpenSky Network.
 
 Components:
@@ -26,7 +26,7 @@ from . import analysis
 from . import visualization
 
 __all__ = [
-    'tracking',
-    'analysis',
-    'visualization',
+    "tracking",
+    "analysis",
+    "visualization",
 ]

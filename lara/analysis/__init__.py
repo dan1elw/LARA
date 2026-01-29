@@ -29,12 +29,11 @@ from . import constants
 
 __all__ = [
     # Main classes
-    'FlightAnalyzer',
-    'CorridorDetector',
-    'PatternMatcher',
-    'StatisticsEngine',
-    'ReportGenerator',
-    
+    "FlightAnalyzer",
+    "CorridorDetector",
+    "PatternMatcher",
+    "StatisticsEngine",
+    "ReportGenerator",
     # Modules
-    'constants',
+    "constants",
 ]

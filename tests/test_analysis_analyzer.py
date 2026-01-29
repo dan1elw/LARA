@@ -17,14 +17,14 @@ from lara.analysis import FlightAnalyzer
 @pytest.fixture
 def full_db():
     """Create full database for analyzer testing."""
-    fd, db_path = tempfile.mkstemp(suffix='.db')
+    fd, db_path = tempfile.mkstemp(suffix=".db")
     os.close(fd)
-    
+
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    
+
     # Create COMPLETE schema matching tracking component
-    cursor.execute('''
+    cursor.execute("""
         CREATE TABLE flights (
             id INTEGER PRIMARY KEY,
             icao24 TEXT,
@@ -36,9 +36,9 @@ def full_db():
             max_altitude_m REAL,
             min_altitude_m REAL
         )
-    ''')
-    
-    cursor.execute('''
+    """)
+
+    cursor.execute("""
         CREATE TABLE positions (
             id INTEGER PRIMARY KEY,
             flight_id INTEGER,
@@ -48,22 +48,22 @@ def full_db():
             heading REAL,
             distance_from_home_km REAL
         )
-    ''')
-    
+    """)
+
     conn.commit()
     conn.close()
-    
+
     yield db_path
-    
+
     try:
         os.unlink(db_path)
-    except:
+    except Exception:
         pass
 
 
 class TestFlightAnalyzer:
     """Tests for FlightAnalyzer class."""
-    
+
     def test_init(self, full_db):
         """Test analyzer initialization."""
         analyzer = FlightAnalyzer(full_db)
@@ -72,56 +72,56 @@ class TestFlightAnalyzer:
         assert analyzer.pattern_matcher is not None
         assert analyzer.statistics is not None
         analyzer.close()
-    
+
     def test_analyze_corridors(self, full_db):
         """Test corridor analysis method."""
         analyzer = FlightAnalyzer(full_db)
         result = analyzer.analyze_corridors(grid_size_km=5.0)
-        
-        assert 'total_corridors' in result
+
+        assert "total_corridors" in result
         analyzer.close()
-    
+
     def test_analyze_patterns(self, full_db):
         """Test pattern analysis method."""
         analyzer = FlightAnalyzer(full_db)
         result = analyzer.analyze_patterns()
-        
-        assert 'recurring_flights' in result
+
+        assert "recurring_flights" in result
         analyzer.close()
-    
+
     def test_get_statistics(self, full_db):
         """Test statistics method."""
         analyzer = FlightAnalyzer(full_db)
         result = analyzer.get_statistics()
-        
-        assert 'overview' in result
+
+        assert "overview" in result
         analyzer.close()
-    
+
     def test_analyze_all(self, full_db):
         """Test complete analysis."""
         analyzer = FlightAnalyzer(full_db)
-        
+
         # Create temp output file
-        fd, output_path = tempfile.mkstemp(suffix='.json')
+        fd, output_path = tempfile.mkstemp(suffix=".json")
         os.close(fd)
-        
+
         try:
             result = analyzer.analyze_all(output_path=output_path)
-            
-            assert 'metadata' in result
-            assert 'statistics' in result
-            assert 'corridors' in result
-            assert 'patterns' in result
-            
+
+            assert "metadata" in result
+            assert "statistics" in result
+            assert "corridors" in result
+            assert "patterns" in result
+
             # Check file was created
             assert os.path.exists(output_path)
         finally:
             analyzer.close()
             try:
                 os.unlink(output_path)
-            except:
+            except Exception:
                 pass
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

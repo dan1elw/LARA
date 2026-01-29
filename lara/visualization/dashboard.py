@@ -16,12 +16,17 @@ class Dashboard:
     """
     Creates comprehensive visualization dashboard.
     """
-    
-    def __init__(self, db_path: str, center_lat: float, center_lon: float,
-                 output_dir: str = 'visualizations'):
+
+    def __init__(
+        self,
+        db_path: str,
+        center_lat: float,
+        center_lon: float,
+        output_dir: str = "visualizations",
+    ):
         """
         Initialize dashboard.
-        
+
         Args:
             db_path: Path to LARA database
             center_lat: Home latitude
@@ -33,80 +38,78 @@ class Dashboard:
         self.center_lon = center_lon
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
-        
+
         self.conn = sqlite3.connect(db_path)
         self.conn.row_factory = sqlite3.Row
-    
+
     def generate_complete_dashboard(self, analysis_results: Dict[str, Any] = None):
         """
         Generate complete visualization dashboard.
-        
+
         Args:
             analysis_results: Optional analysis results from lara.analysis
         """
         print("\n" + "=" * 70)
         print("🗺️  GENERATING VISUALIZATION DASHBOARD")
         print("=" * 70)
-        
+
         # 1. Corridor map
         print("\n1. Generating corridor map...")
         self._generate_corridor_map(analysis_results)
-        
+
         # 2. Traffic heatmap
         print("\n2. Generating traffic heatmap...")
         heatmap = HeatmapGenerator(self.db_path, self.center_lat, self.center_lon)
-        heatmap.generate_traffic_heatmap(
-            str(self.output_dir / 'traffic_heatmap.html')
-        )
+        heatmap.generate_traffic_heatmap(str(self.output_dir / "traffic_heatmap.html"))
         heatmap.close()
-        
+
         # 3. Recent flights
         print("\n3. Generating recent flights map...")
         plotter = FlightPlotter(self.db_path, self.center_lat, self.center_lon)
         plotter.plot_recent_flights(
-            hours=24,
-            output_file=str(self.output_dir / 'recent_flights_24h.html')
+            hours=24, output_file=str(self.output_dir / "recent_flights_24h.html")
         )
         plotter.close()
-        
+
         # 4. Altitude heatmap
         print("\n4. Generating altitude heatmap...")
         heatmap = HeatmapGenerator(self.db_path, self.center_lat, self.center_lon)
         heatmap.generate_altitude_heatmap(
-            str(self.output_dir / 'altitude_heatmap.html')
+            str(self.output_dir / "altitude_heatmap.html")
         )
         heatmap.close()
-        
+
         # 5. Generate index page
         print("\n5. Generating dashboard index...")
         self._generate_index_page()
-        
+
         print("\n" + "=" * 70)
         print(f"✅ Dashboard generated in: {self.output_dir}")
         print("=" * 70)
         print(f"\nOpen: {self.output_dir / 'index.html'}")
-    
+
     def _generate_corridor_map(self, analysis_results: Dict[str, Any] = None):
         """Generate corridor visualization map."""
         map_gen = MapGenerator(self.center_lat, self.center_lon)
-        
-        if analysis_results and 'corridors' in analysis_results:
-            corridors = analysis_results['corridors'].get('corridors', [])
-            
+
+        if analysis_results and "corridors" in analysis_results:
+            corridors = analysis_results["corridors"].get("corridors", [])
+
             for corridor in corridors[:20]:  # Top 20
-                map_gen.add_corridor(corridor, corridor['rank'])
+                map_gen.add_corridor(corridor, corridor["rank"])
         else:
             # Fallback: query from database
             from lara.analysis import FlightAnalyzer
+
             analyzer = FlightAnalyzer(self.db_path)
             result = analyzer.analyze_corridors()
             analyzer.close()
-            
-            for corridor in result['corridors'][:20]:
-                map_gen.add_corridor(corridor, corridor['rank'])
-        
-        map_gen.save(str(self.output_dir / 'corridors.html'))
-    
+
+            for corridor in result["corridors"][:20]:
+                map_gen.add_corridor(corridor, corridor["rank"])
+
+        map_gen.save(str(self.output_dir / "corridors.html"))
+
     def _generate_index_page(self):
         """Generate HTML index page for dashboard."""
         html = """
@@ -242,10 +245,10 @@ class Dashboard:
 </body>
 </html>
 """
-        
-        with open(self.output_dir / 'index.html', 'w') as f:
+
+        with open(self.output_dir / "index.html", "w") as f:
             f.write(html)
-    
+
     def close(self):
         """Close database connection."""
         if self.conn:
