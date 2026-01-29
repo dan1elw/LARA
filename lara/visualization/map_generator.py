@@ -11,29 +11,39 @@ from typing import Dict, Any, List, Tuple, Optional
 import json
 
 from .constants import (
-    DEFAULT_MAP_STYLE, DEFAULT_ZOOM, MAP_TILE_URLS,
-    ALTITUDE_COLORS, FLIGHT_PATH_COLOR, FLIGHT_PATH_WEIGHT,
-    FLIGHT_PATH_OPACITY, MARKER_RADIUS, MARKER_OPACITY
+    DEFAULT_MAP_STYLE,
+    DEFAULT_ZOOM,
+    MAP_TILE_URLS,
+    ALTITUDE_COLORS,
+    FLIGHT_PATH_COLOR,
+    FLIGHT_PATH_WEIGHT,
+    FLIGHT_PATH_OPACITY,
+    MARKER_RADIUS,
+    MARKER_OPACITY,
 )
 
 
 class MapGenerator:
     """
     Generates interactive maps using Folium.
-    
+
     Supports visualization of:
     - Flight paths (individual trajectories)
     - Flight corridors (linear routes with multiple flights)
     - Position markers
     - Traffic density heatmaps
     """
-    
-    def __init__(self, center_lat: float, center_lon: float, 
-                 zoom: int = DEFAULT_ZOOM,
-                 style: str = DEFAULT_MAP_STYLE):
+
+    def __init__(
+        self,
+        center_lat: float,
+        center_lon: float,
+        zoom: int = DEFAULT_ZOOM,
+        style: str = DEFAULT_MAP_STYLE,
+    ):
         """
         Initialize map generator.
-        
+
         Args:
             center_lat: Center latitude (home location)
             center_lon: Center longitude (home location)
@@ -44,58 +54,62 @@ class MapGenerator:
         self.center_lon = center_lon
         self.zoom = zoom
         self.style = style
-        
+
         # Create base map
         self.map = self._create_base_map()
-    
+
     def _create_base_map(self) -> folium.Map:
         """Create base Folium map with dark theme."""
-        
+
         if self.style in MAP_TILE_URLS:
             tiles = MAP_TILE_URLS[self.style]
         else:
             tiles = self.style
-        
+
         m = folium.Map(
             location=[self.center_lat, self.center_lon],
             zoom_start=self.zoom,
             tiles=tiles,
-            attr='LARA Flight Visualization'
+            attr="LARA Flight Visualization",
         )
-        
+
         # Add home location marker
         folium.Marker(
             [self.center_lat, self.center_lon],
-            popup='Home Location',
-            tooltip='Your Location',
-            icon=folium.Icon(color='red', icon='home', prefix='fa')
+            popup="Home Location",
+            tooltip="Your Location",
+            icon=folium.Icon(color="red", icon="home", prefix="fa"),
         ).add_to(m)
-        
+
         return m
-    
-    def add_flight_path(self, positions: List[Dict[str, Any]], 
-                       flight_info: Dict[str, Any]):
+
+    def add_flight_path(
+        self, positions: List[Dict[str, Any]], flight_info: Dict[str, Any]
+    ):
         """
         Add a flight path to the map.
-        
+
         Args:
             positions: List of position dictionaries with lat/lon/altitude
             flight_info: Flight metadata (callsign, icao24, etc.)
         """
         if not positions:
             return
-        
+
         # Extract coordinates
-        coords = [[p['latitude'], p['longitude']] for p in positions 
-                 if p['latitude'] and p['longitude']]
-        
+        coords = [
+            [p["latitude"], p["longitude"]]
+            for p in positions
+            if p["latitude"] and p["longitude"]
+        ]
+
         if not coords:
             return
-        
+
         # Color by altitude
-        avg_altitude = sum(p.get('altitude_m', 0) for p in positions) / len(positions)
+        avg_altitude = sum(p.get("altitude_m", 0) for p in positions) / len(positions)
         color = self._get_altitude_color(avg_altitude)
-        
+
         # Create polyline for flight path
         folium.PolyLine(
             coords,
@@ -103,16 +117,16 @@ class MapGenerator:
             weight=FLIGHT_PATH_WEIGHT,
             opacity=FLIGHT_PATH_OPACITY,
             popup=f"{flight_info.get('callsign', 'Unknown')} - {avg_altitude:.0f}m",
-            tooltip=flight_info.get('callsign', 'Unknown')
+            tooltip=flight_info.get("callsign", "Unknown"),
         ).add_to(self.map)
-    
+
     def add_corridor(self, corridor: Dict[str, Any], rank: int):
         """
         Add a linear flight corridor to the map.
-        
+
         Draws corridors as line segments with width indicators,
         showing the actual linear path rather than circular clusters.
-        
+
         Args:
             corridor: Corridor data dictionary with:
                 - start_lat, start_lon: Start point
@@ -125,19 +139,19 @@ class MapGenerator:
             rank: Corridor rank (for color coding and priority)
         """
         # Extract corridor geometry
-        start_lat = corridor.get('start_lat', corridor['center_lat'])
-        start_lon = corridor.get('start_lon', corridor['center_lon'])
-        end_lat = corridor.get('end_lat', corridor['center_lat'])
-        end_lon = corridor.get('end_lon', corridor['center_lon'])
-        
+        start_lat = corridor.get("start_lat", corridor["center_lat"])
+        start_lon = corridor.get("start_lon", corridor["center_lon"])
+        end_lat = corridor.get("end_lat", corridor["center_lat"])
+        end_lon = corridor.get("end_lon", corridor["center_lon"])
+
         # Color based on rank
         color = self._get_rank_color(rank)
-        
+
         # Calculate line weight based on traffic volume
         # More flights = thicker line
         base_weight = 3
-        weight = min(base_weight + (corridor['unique_flights'] // 5), 12)
-        
+        weight = min(base_weight + (corridor["unique_flights"] // 5), 12)
+
         # Create main corridor line
         corridor_line = folium.PolyLine(
             locations=[[start_lat, start_lon], [end_lat, end_lon]],
@@ -145,33 +159,33 @@ class MapGenerator:
             weight=weight,
             opacity=0.8,
             popup=self._create_corridor_popup(corridor, rank),
-            tooltip=f"Corridor #{rank} ({corridor['unique_flights']} flights)"
+            tooltip=f"Corridor #{rank} ({corridor['unique_flights']} flights)",
         )
         corridor_line.add_to(self.map)
-        
+
         # Add width indicator (parallel lines)
         width_lines = self._create_width_indicators(
-            start_lat, start_lon, end_lat, end_lon,
-            corridor.get('width_km', 2.0),
-            color
+            start_lat, start_lon, end_lat, end_lon, corridor.get("width_km", 2.0), color
         )
         for line in width_lines:
             line.add_to(self.map)
-        
+
     def _create_corridor_popup(self, corridor: Dict[str, Any], rank: int) -> str:
         """
         Create HTML popup for corridor visualization.
-        
+
         Args:
             corridor: Corridor data
             rank: Corridor rank
-        
+
         Returns:
             HTML string for popup
         """
-        linearity = corridor.get('linearity_score', 0.0)
-        linearity_quality = "Excellent" if linearity > 0.8 else "Good" if linearity > 0.6 else "Fair"
-        
+        linearity = corridor.get("linearity_score", 0.0)
+        linearity_quality = (
+            "Excellent" if linearity > 0.8 else "Good" if linearity > 0.6 else "Fair"
+        )
+
         html = f"""
         <div style='font-family: Arial; min-width: 200px;'>
             <h4 style='margin: 0 0 10px 0; color: #667eea;'>
@@ -189,7 +203,7 @@ class MapGenerator:
         </div>
         """
         return html
-    
+
     def _create_width_indicators(
         self,
         start_lat: float,
@@ -197,145 +211,149 @@ class MapGenerator:
         end_lat: float,
         end_lon: float,
         width_km: float,
-        color: str
+        color: str,
     ) -> List[folium.PolyLine]:
         """
         Create parallel lines to indicate corridor width.
-        
+
         Args:
             start_lat, start_lon: Start point
             end_lat, end_lon: End point
             width_km: Corridor width in km
             color: Line color
-        
+
         Returns:
             List of polylines representing width boundaries
         """
         import math
-        
+
         # Calculate perpendicular offset (half width on each side)
         offset_km = width_km / 4  # Quarter width for visual clarity
-        
+
         # Calculate bearing
-        lat1, lon1, lat2, lon2 = map(math.radians, [start_lat, start_lon, end_lat, end_lon])
+        lat1, lon1, lat2, lon2 = map(
+            math.radians, [start_lat, start_lon, end_lat, end_lon]
+        )
         dlon = lon2 - lon1
         x = math.sin(dlon) * math.cos(lat2)
-        y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(dlon)
+        y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(
+            lat2
+        ) * math.cos(dlon)
         bearing = math.atan2(x, y)
-        
+
         # Perpendicular bearing (±90°)
         perp_bearing_1 = bearing + math.pi / 2
         perp_bearing_2 = bearing - math.pi / 2
-        
+
         R = 6371  # Earth radius in km
-        
+
         # Calculate offset points
         def offset_point(lat, lon, bearing, distance):
             lat_rad = math.radians(lat)
             lon_rad = math.radians(lon)
-            
+
             lat_new = math.asin(
-                math.sin(lat_rad) * math.cos(distance / R) +
-                math.cos(lat_rad) * math.sin(distance / R) * math.cos(bearing)
+                math.sin(lat_rad) * math.cos(distance / R)
+                + math.cos(lat_rad) * math.sin(distance / R) * math.cos(bearing)
             )
             lon_new = lon_rad + math.atan2(
                 math.sin(bearing) * math.sin(distance / R) * math.cos(lat_rad),
-                math.cos(distance / R) - math.sin(lat_rad) * math.sin(lat_new)
+                math.cos(distance / R) - math.sin(lat_rad) * math.sin(lat_new),
             )
-            
+
             return math.degrees(lat_new), math.degrees(lon_new)
-        
+
         # Create parallel lines
         start_offset_1 = offset_point(start_lat, start_lon, perp_bearing_1, offset_km)
         end_offset_1 = offset_point(end_lat, end_lon, perp_bearing_1, offset_km)
-        
+
         start_offset_2 = offset_point(start_lat, start_lon, perp_bearing_2, offset_km)
         end_offset_2 = offset_point(end_lat, end_lon, perp_bearing_2, offset_km)
-        
+
         lines = []
-        
+
         # Add dashed boundary lines
         line1 = folium.PolyLine(
             locations=[start_offset_1, end_offset_1],
             color=color,
             weight=1,
             opacity=0.4,
-            dash_array='5, 5'
+            dash_array="5, 5",
         )
         lines.append(line1)
-        
+
         line2 = folium.PolyLine(
             locations=[start_offset_2, end_offset_2],
             color=color,
             weight=1,
             opacity=0.4,
-            dash_array='5, 5'
+            dash_array="5, 5",
         )
         lines.append(line2)
-        
+
         return lines
-    
+
     def _get_altitude_color(self, altitude_m: float) -> str:
         """
         Get color based on altitude.
-        
+
         Args:
             altitude_m: Altitude in meters
-        
+
         Returns:
             Color hex code
         """
         if altitude_m < 1000:
-            return ALTITUDE_COLORS['very_low']
+            return ALTITUDE_COLORS["very_low"]
         elif altitude_m < 3000:
-            return ALTITUDE_COLORS['low']
+            return ALTITUDE_COLORS["low"]
         elif altitude_m < 6000:
-            return ALTITUDE_COLORS['medium']
+            return ALTITUDE_COLORS["medium"]
         elif altitude_m < 9000:
-            return ALTITUDE_COLORS['high']
+            return ALTITUDE_COLORS["high"]
         elif altitude_m < 12000:
-            return ALTITUDE_COLORS['very_high']
+            return ALTITUDE_COLORS["very_high"]
         else:
-            return ALTITUDE_COLORS['cruise']
-    
+            return ALTITUDE_COLORS["cruise"]
+
     def _get_rank_color(self, rank: int) -> str:
         """
         Get color based on corridor rank.
-        
+
         Top-ranked corridors get more prominent colors.
-        
+
         Args:
             rank: Corridor rank (1 = highest traffic)
-        
+
         Returns:
             Color hex code
         """
         colors = [
-            '#e74c3c',  # Rank 1 - Red (highest traffic)
-            '#e67e22',  # Rank 2 - Orange
-            '#f39c12',  # Rank 3 - Yellow
-            '#2ecc71',  # Rank 4-5 - Green
-            '#3498db',  # Rank 6+ - Blue
+            "#e74c3c",  # Rank 1 - Red (highest traffic)
+            "#e67e22",  # Rank 2 - Orange
+            "#f39c12",  # Rank 3 - Yellow
+            "#2ecc71",  # Rank 4-5 - Green
+            "#3498db",  # Rank 6+ - Blue
         ]
         return colors[min(rank - 1, len(colors) - 1)]
-    
+
     def save(self, filename: str):
         """
         Save map to HTML file.
-        
+
         Args:
             filename: Output filename (should end in .html)
         """
         self.map.save(filename)
 
         # Modify HTML file to include title and favicon
-        with open(filename, 'r', encoding='utf-8') as f:
+        with open(filename, "r", encoding="utf-8") as f:
             html_content = f.read()
-        line1 = '<title>LARA Map</title>'
+        line1 = "<title>LARA Map</title>"
         line2 = '<link rel="icon" href="../docu/icon.ico">'
         insert = "<head>\n    " + line1 + "\n    " + line2
         html_content = html_content.replace("<head>", insert, 1)
-        with open(filename, 'w', encoding='utf-8') as f:
+        with open(filename, "w", encoding="utf-8") as f:
             f.write(html_content)
 
         print(f"✅ Map saved to: {filename}")
