@@ -17,6 +17,14 @@ from dataclasses import dataclass
 from collections import defaultdict
 import math
 
+from lara.analysis.constants import (
+    HEADING_TOLERANCE_DEG,
+    PROXIMITY_THRESHOLD_KM,
+    MIN_CORRIDOR_LENGTH_KM,
+    MIN_LINEARITY_SCORE,
+    MIN_FLIGHTS_FOR_CORRIDOR
+)
+
 # Type alias for database row (since we can't import sqlite3.Row type)
 DbRow = Any
 
@@ -90,14 +98,6 @@ class CorridorDetector:
         MIN_LINEARITY_SCORE: Minimum linearity score (0-1) for quality filter
     """
 
-    # Configuration constants
-    HEADING_TOLERANCE_DEG: float = 30.0  # Positions within ±30° are same direction
-    PROXIMITY_THRESHOLD_KM: float = (
-        10.0  # Positions within 10km can belong to same corridor
-    )
-    MIN_CORRIDOR_LENGTH_KM: float = 3.0  # Minimum corridor length (lowered to 3km)
-    MIN_LINEARITY_SCORE: float = 0.5  # Minimum linearity (0-1, lowered to 0.5)
-
     def __init__(self, db_conn: Any) -> None:
         """
         Initialize corridor detector.
@@ -109,7 +109,7 @@ class CorridorDetector:
 
     def detect_corridors(
         self,
-        min_flights: int = 10,
+        min_flights: int = MIN_FLIGHTS_FOR_CORRIDOR,
         heading_tolerance: float = HEADING_TOLERANCE_DEG,
         proximity_km: float = PROXIMITY_THRESHOLD_KM,
     ) -> Dict[str, Any]:
@@ -178,8 +178,8 @@ class CorridorDetector:
         quality_corridors = [
             c
             for c in corridors
-            if c.linearity_score >= self.MIN_LINEARITY_SCORE
-            and c.length_km >= self.MIN_CORRIDOR_LENGTH_KM
+            if c.linearity_score >= MIN_LINEARITY_SCORE
+            and c.length_km >= MIN_CORRIDOR_LENGTH_KM
         ]
 
         print(
@@ -210,8 +210,8 @@ class CorridorDetector:
                 "min_flights": min_flights,
                 "heading_tolerance": heading_tolerance,
                 "proximity_km": proximity_km,
-                "min_linearity": self.MIN_LINEARITY_SCORE,
-                "min_length_km": self.MIN_CORRIDOR_LENGTH_KM,
+                "min_linearity": MIN_LINEARITY_SCORE,
+                "min_length_km": MIN_CORRIDOR_LENGTH_KM,
             },
         }
 
