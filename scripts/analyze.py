@@ -21,92 +21,83 @@ from lara.analysis import FlightAnalyzer
 def main():
     """Main entry point for analyzer."""
     parser = argparse.ArgumentParser(
-        description='LARA Flight Data Analyzer - Advanced pattern analysis'
+        description="LARA Flight Data Analyzer - Advanced pattern analysis"
     )
     parser.add_argument(
-        '--db',
+        "--db", type=str, help="Path to database file (default: from config.yaml)"
+    )
+    parser.add_argument(
+        "--output", type=str, help="Output file for report (default: auto-generated)"
+    )
+    parser.add_argument(
+        "--format",
         type=str,
-        help='Path to database file (default: from config.yaml)'
+        choices=["json", "txt", "html"],
+        default="json",
+        help="Report format (default: json)",
     )
     parser.add_argument(
-        '--output',
-        type=str,
-        help='Output file for report (default: auto-generated)'
+        "--corridors-only", action="store_true", help="Run only corridor analysis"
     )
     parser.add_argument(
-        '--format',
-        type=str,
-        choices=['json', 'txt', 'html'],
-        default='json',
-        help='Report format (default: json)'
+        "--patterns-only", action="store_true", help="Run only pattern analysis"
     )
     parser.add_argument(
-        '--corridors-only',
-        action='store_true',
-        help='Run only corridor analysis'
+        "--stats-only", action="store_true", help="Run only statistical analysis"
     )
     parser.add_argument(
-        '--patterns-only',
-        action='store_true',
-        help='Run only pattern analysis'
-    )
-    parser.add_argument(
-        '--stats-only',
-        action='store_true',
-        help='Run only statistical analysis'
-    )
-    parser.add_argument(
-        '--grid-size',
+        "--grid-size",
         type=float,
         default=5.0,
-        help='Grid size in km for corridor analysis (default: 5.0)'
+        help="Grid size in km for corridor analysis (default: 5.0)",
     )
-    
+
     args = parser.parse_args()
-    
+
     # Get database path
     if args.db:
         db_path = args.db
     else:
-        config = Config('lara/tracking/config.yaml')
+        config = Config("lara/tracking/config.yaml")
         db_path = config.db_path
-    
+
     # Create output filename
     if not args.output:
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         args.output = f"data/lara_analysis_{timestamp}.{args.format}"
-    
+
     # Create analyzer
     try:
         analyzer = FlightAnalyzer(db_path)
     except Exception as e:
         print(f"❌ Error opening database: {e}")
         sys.exit(1)
-    
+
     try:
         if args.corridors_only:
             # Run only corridor analysis
-            results = analyzer.analyze_corridors()
-            print(f"\n✅ Corridor analysis complete!")
-            
+            results = analyzer.analyze_corridors(grid_size_km=args.grid_size)
+            print("\n✅ Corridor analysis complete!")
+
         elif args.patterns_only:
             # Run only pattern analysis
             results = analyzer.analyze_patterns()
-            print(f"\n✅ Pattern analysis complete!")
-            
+            print("\n✅ Pattern analysis complete!")
+
         elif args.stats_only:
             # Run only statistical analysis
             results = analyzer.get_statistics()
-            print(f"\n✅ Statistical analysis complete!")
-            
+            print("\n✅ Statistical analysis complete!")
+
         else:
             # Run full analysis
-            results = analyzer.analyze_all(output_path=args.output)
+            _ = analyzer.analyze_all(output_path=args.output)
             print(f"\n✅ Complete analysis saved to: {args.output}")
-    
+
     except Exception as e:
         print(f"❌ Error during analysis: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
     finally:

@@ -37,22 +37,22 @@ def linear_corridor_db():
     """
     fd, db_path = tempfile.mkstemp(suffix='.db')
     os.close(fd)
-    
+
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    
+
     # Create tables
-    cursor.execute('''
+    cursor.execute("""
         CREATE TABLE flights (
             id INTEGER PRIMARY KEY,
             icao24 TEXT,
             callsign TEXT,
             origin_country TEXT
         )
-    ''')
-    
-    cursor.execute('''
+    """)
+
+    cursor.execute("""
         CREATE TABLE positions (
             id INTEGER PRIMARY KEY,
             flight_id INTEGER,
@@ -169,7 +169,7 @@ def multi_corridor_db():
     
     conn.commit()
     yield conn
-    
+
     conn.close()
     try:
         os.unlink(db_path)
