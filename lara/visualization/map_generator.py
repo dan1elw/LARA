@@ -13,6 +13,7 @@ from .constants import (
     DEFAULT_ZOOM,
     MAP_TILE_URLS,
     ALTITUDE_COLORS,
+    RANKED_COLORS,
     FLIGHT_PATH_WEIGHT,
     FLIGHT_PATH_OPACITY,
 )
@@ -323,14 +324,7 @@ class MapGenerator:
         Returns:
             Color hex code
         """
-        colors = [
-            "#e74c3c",  # Rank 1 - Red (highest traffic)
-            "#e67e22",  # Rank 2 - Orange
-            "#f39c12",  # Rank 3 - Yellow
-            "#2ecc71",  # Rank 4-5 - Green
-            "#3498db",  # Rank 6+ - Blue
-        ]
-        return colors[min(rank - 1, len(colors) - 1)]
+        return RANKED_COLORS[min(rank - 1, len(RANKED_COLORS) - 1)]
 
     def save(self, filename: str):
         """
