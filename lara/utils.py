@@ -5,7 +5,7 @@ Common utility functions for distance calculations and data processing.
 
 from math import radians, sin, cos, sqrt, atan2, degrees
 from typing import Tuple
-from .tracking.constants import EARTH_RADIUS_KM, KM_PER_DEGREE_LAT
+from .config import Constants
 
 
 def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -39,7 +39,7 @@ def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> fl
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
-    return EARTH_RADIUS_KM * c
+    return Constants.EARTH_RADIUS_KM * c
 
 
 def perpendicular_distance(lat: float, lon: float, line) -> float:
@@ -81,7 +81,7 @@ def perpendicular_distance(lat: float, lon: float, line) -> float:
     cross = abs(dx1 * dy2 - dy1 * dx2)
 
     # Convert to kilometers (approximate)
-    return cross * KM_PER_DEGREE_LAT  # degrees to km
+    return cross * Constants.KM_PER_DEGREE_LAT  # degrees to km
 
 
 def calculate_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -132,10 +132,10 @@ def get_bounding_box(
         (48.9008, 7.5164, 49.8008, 8.7564)
     """
     # Calculate latitude delta (constant)
-    lat_delta = radius_km / KM_PER_DEGREE_LAT
+    lat_delta = radius_km / Constants.KM_PER_DEGREE_LAT
 
     # Calculate longitude delta (varies by latitude)
-    lon_delta = radius_km / (KM_PER_DEGREE_LAT * cos(radians(lat)))
+    lon_delta = radius_km / (Constants.KM_PER_DEGREE_LAT * cos(radians(lat)))
 
     return (
         lat - lat_delta,  # lat_min
@@ -164,9 +164,7 @@ def format_altitude(altitude_m: float, include_feet: bool = True) -> str:
         return "N/A"
 
     if include_feet:
-        from .tracking.constants import METERS_TO_FEET
-
-        feet = altitude_m * METERS_TO_FEET
+        feet = altitude_m * Constants.METERS_TO_FEET
         return f"{altitude_m:.0f} m ({feet:.0f} ft)"
 
     return f"{altitude_m:.0f} m"
@@ -191,9 +189,7 @@ def format_speed(velocity_ms: float, unit: str = "kmh") -> str:
         return "N/A"
 
     if unit == "kmh":
-        from .tracking.constants import MS_TO_KMH
-
-        return f"{velocity_ms * MS_TO_KMH:.1f} km/h"
+        return f"{velocity_ms * Constants.MS_TO_KMH:.1f} km/h"
     elif unit == "knots":
         return f"{velocity_ms * 1.94384:.1f} knots"
     else:  # ms

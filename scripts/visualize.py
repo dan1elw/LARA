@@ -30,7 +30,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from lara.tracking import Config
+from lara.config import Config
 from lara.visualization import MapGenerator, FlightPlotter, HeatmapGenerator, Dashboard
 from lara.analysis import FlightAnalyzer
 

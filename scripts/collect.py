@@ -13,7 +13,8 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from lara.tracking import Config, FlightCollector
+from lara.tracking import FlightCollector
+from lara.config import Config
 
 
 def main():

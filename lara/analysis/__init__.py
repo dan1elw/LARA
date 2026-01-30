@@ -24,9 +24,6 @@ from .pattern_matcher import PatternMatcher
 from .statistics import StatisticsEngine
 from .reporter import ReportGenerator
 
-# Utilities
-from . import constants
-
 __all__ = [
     # Main classes
     "FlightAnalyzer",

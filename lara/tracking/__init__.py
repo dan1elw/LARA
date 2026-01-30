@@ -18,18 +18,13 @@ Example:
 """
 
 # Core tracking components
-from ..config import Config
 from .database import FlightDatabase
 from .collector import FlightCollector
 from .reader import FlightReader
 from .auth import OpenSkyAuth, OpenSkyBasicAuth, create_auth_from_config
 
-# Utilities
-from . import constants
-
 __all__ = [
     # Main classes
-    "Config",
     "FlightDatabase",
     "FlightCollector",
     "FlightReader",
@@ -37,7 +32,4 @@ __all__ = [
     "OpenSkyAuth",
     "OpenSkyBasicAuth",
     "create_auth_from_config",
-    # Modules
-    "utils",
-    "constants",
 ]

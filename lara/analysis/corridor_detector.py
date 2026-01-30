@@ -16,15 +16,8 @@ from typing import Dict, Any, List, Tuple, Optional
 from dataclasses import dataclass
 from collections import defaultdict
 
-from lara.analysis.constants import (
-    HEADING_TOLERANCE_DEG,
-    PROXIMITY_THRESHOLD_KM,
-    MIN_CORRIDOR_LENGTH_KM,
-    MIN_LINEARITY_SCORE,
-    MIN_FLIGHTS_FOR_CORRIDOR,
-)
-
-from ..utils import haversine_distance, perpendicular_distance, calculate_bearing
+from lara.config import Settings
+from lara.utils import haversine_distance, perpendicular_distance, calculate_bearing
 
 # Type alias for database row (since we can't import sqlite3.Row type)
 DbRow = Any
@@ -110,9 +103,9 @@ class CorridorDetector:
 
     def detect_corridors(
         self,
-        min_flights: int = MIN_FLIGHTS_FOR_CORRIDOR,
-        heading_tolerance: float = HEADING_TOLERANCE_DEG,
-        proximity_km: float = PROXIMITY_THRESHOLD_KM,
+        min_flights: int = Settings.MIN_FLIGHTS_FOR_CORRIDOR,
+        heading_tolerance: float = Settings.HEADING_TOLERANCE_DEG,
+        proximity_km: float = Settings.PROXIMITY_THRESHOLD_KM,
     ) -> Dict[str, Any]:
         """
         Detect flight corridors using directional path analysis.
@@ -179,8 +172,8 @@ class CorridorDetector:
         quality_corridors = [
             c
             for c in corridors
-            if c.linearity_score >= MIN_LINEARITY_SCORE
-            and c.length_km >= MIN_CORRIDOR_LENGTH_KM
+            if c.linearity_score >= Settings.MIN_LINEARITY_SCORE
+            and c.length_km >= Settings.MIN_CORRIDOR_LENGTH_KM
         ]
 
         print(
@@ -211,8 +204,8 @@ class CorridorDetector:
                 "min_flights": min_flights,
                 "heading_tolerance": heading_tolerance,
                 "proximity_km": proximity_km,
-                "min_linearity": MIN_LINEARITY_SCORE,
-                "min_length_km": MIN_CORRIDOR_LENGTH_KM,
+                "min_linearity": Settings.MIN_LINEARITY_SCORE,
+                "min_length_km": Settings.MIN_CORRIDOR_LENGTH_KM,
             },
         }
 

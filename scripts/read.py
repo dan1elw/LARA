@@ -14,7 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from lara.tracking import FlightReader, Config
-from lara.tracking.constants import METERS_TO_FEET
+from lara.config import Constants
 
 
 def print_menu():
@@ -48,7 +48,7 @@ def display_overview(reader: FlightReader):
     print(f"Total Position Updates:   {stats['total_positions']:,}")
 
     if stats["avg_altitude_m"]:
-        avg_alt_ft = stats["avg_altitude_m"] * METERS_TO_FEET
+        avg_alt_ft = stats["avg_altitude_m"] * Constants.METERS_TO_FEET
         print(
             f"Average Altitude:         {stats['avg_altitude_m']:.0f} m ({avg_alt_ft:.0f} ft)"
         )

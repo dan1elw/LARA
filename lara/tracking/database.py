@@ -6,7 +6,7 @@ SQLite database operations for storing and querying flight data.
 import sqlite3
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-from .constants import FLIGHT_SESSION_TIMEOUT_MINUTES
+from lara.config import Settings
 
 
 class FlightDatabase:
@@ -128,7 +128,7 @@ class FlightDatabase:
             f"""
             SELECT id FROM flights 
             WHERE icao24 = ? AND callsign = ?
-            AND datetime(last_seen) > datetime(?, '-{FLIGHT_SESSION_TIMEOUT_MINUTES} minutes')
+            AND datetime(last_seen) > datetime(?, '-{Settings.FLIGHT_SESSION_TIMEOUT_MINUTES} minutes')
             ORDER BY last_seen DESC LIMIT 1
         """,
             (icao24, callsign, timestamp),
