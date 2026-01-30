@@ -7,18 +7,21 @@ import os
 from typing import Dict, Any
 
 
-class Constants():
-    EARTH_RADIUS_KM = 6371      # 
-    METERS_TO_FEET = 3.28084    # 
-    MS_TO_KMH = 3.6             # 
+class Constants:
+    """ Constant values, meant not to be changed, as they represent physical world."""
+
+    EARTH_RADIUS_KM = 6371  # Approximate Earth radius
+    METERS_TO_FEET = 3.28084  # Conversion meters to feet
+    MS_TO_KMH = 3.6  # conversion meter/second to kilometer/hour
     KM_PER_DEGREE_LAT = 111.32  # Approximate conversion at equator
 
 
-class Settings():
+class Settings:
     """Tracking Settings"""
-    FLIGHT_SESSION_TIMEOUT_MINUTES = 30     # A flight is considered the same if it has the same ICAO24 and callsign, and was last seen within FLIGHT_SESSION_TIMEOUT_MINUTES.
-    MIN_UPDATE_INTERVAL = 10                # OpenSky rate limit
-    ALTITUDE_RANGES = [                     # 
+
+    FLIGHT_SESSION_TIMEOUT_MINUTES = 30  # A flight is considered the same if it has the same ICAO24 and callsign, and was last seen within FLIGHT_SESSION_TIMEOUT_MINUTES.
+    MIN_UPDATE_INTERVAL = 10  # OpenSky update rate limit
+    ALTITUDE_RANGES = [  # Altitude Ranges for clustering
         (0, 1000, "0-1000m"),
         (1000, 3000, "1000-3000m"),
         (3000, 6000, "3000-6000m"),
@@ -28,16 +31,21 @@ class Settings():
     ]
 
     """Analysis Settings"""
-    HEADING_TOLERANCE_DEG: float = 20.0     # Corridor analysis Positions within ±20° are same direction
-    PROXIMITY_THRESHOLD_KM: float = 10.0    # Positions within 10km can belong to same corridor
-    MIN_CORRIDOR_LENGTH_KM: float = 3.0     # Minimum corridor length (lowered to 3km)
-    MIN_LINEARITY_SCORE: float = 0.3        # Minimum linearity (0-1, lowered to 0.5)
-    MIN_FLIGHTS_FOR_CORRIDOR: int = 15      # Minimum unique flights to qualify as corridor
-    PEAK_HOUR_THRESHOLD = 0.7               # Time analysis 70% of max hourly traffic
-    DAYS_FOR_TREND_ANALYSIS = 30            # Time analysis
-    MIN_PATTERN_OCCURRENCES = 5             # Pattern detection
-    ROUTE_SIMILARITY_THRESHOLD = 0.8        # Pattern detection 80% similarity
-    ALTITUDE_CLASSES = {                    # Altitude classifications (meters)
+
+    HEADING_TOLERANCE_DEG: float = (
+        20.0  # Corridor analysis Positions within ±20° are same direction
+    )
+    PROXIMITY_THRESHOLD_KM: float = (
+        10.0  # Positions within 10km can belong to same corridor
+    )
+    MIN_CORRIDOR_LENGTH_KM: float = 3.0  # Minimum corridor length (lowered to 3km)
+    MIN_LINEARITY_SCORE: float = 0.3  # Minimum linearity (0-1, lowered to 0.5)
+    MIN_FLIGHTS_FOR_CORRIDOR: int = 15  # Minimum unique flights to qualify as corridor
+    PEAK_HOUR_THRESHOLD = 0.7  # Time analysis 70% of max hourly traffic
+    DAYS_FOR_TREND_ANALYSIS = 30  # Time analysis
+    MIN_PATTERN_OCCURRENCES = 5  # Pattern detection
+    ROUTE_SIMILARITY_THRESHOLD = 0.8  # Pattern detection 80% similarity
+    ALTITUDE_CLASSES = {  # Altitude classifications (meters)
         "very_low": (0, 1000),
         "low": (1000, 3000),
         "medium": (3000, 6000),
@@ -45,7 +53,7 @@ class Settings():
         "very_high": (9000, 12000),
         "cruise": (12000, float("inf")),
     }
-    DISTANCE_CLASSES = {                    # Distance classifications (km)
+    DISTANCE_CLASSES = {  # Distance classifications (km)
         "very_close": (0, 5),
         "close": (5, 10),
         "medium": (10, 20),
@@ -54,18 +62,19 @@ class Settings():
     }
 
     """Visualization Settings"""
+
     DEFAULT_MAP_STYLE = "CartoDB.Positron"
     DEFAULT_ZOOM = 10
     FLIGHT_PATH_WEIGHT = 2
     FLIGHT_PATH_OPACITY = 0.6
-    MARKER_RADIUS = 8                       # Marker styles
+    MARKER_RADIUS = 8  # Marker styles
     MARKER_OPACITY = 0.7
     MARKER_FILL_OPACITY = 0.5
-    CORRIDOR_OPACITY = 0.3                  # Corridor visualization
+    CORRIDOR_OPACITY = 0.3  # Corridor visualization
     CORRIDOR_BORDER_WEIGHT = 2
 
 
-class Colors():
+class Colors:
     ALTITUDE_COLORS = {
         "very_low": "#ff3b3b",  # 0 - 1000 m
         "low": "#ff7a18",  # 1000 - 3000 m
@@ -119,7 +128,7 @@ class Config:
         except Exception as e:
             print(f"Warning: Could not load config file: {e}")
             return self._get_default_config()
-        
+
     def _validate_config(self, config: Dict[str, Any]) -> bool:
         """Validate configuration structure and types."""
         # Basic validation can be extended as needed

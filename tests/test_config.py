@@ -5,30 +5,33 @@ Tests for configuration management.
 import pytest
 from lara.config import Config
 
+
 @pytest.fixture
 def sample_config():
     """Get default configuration."""
-    return str({
-        "location": {
-            "latitude": 48.8566,
-            "longitude": 2.3522,
-            "name": "Paris, France",
-        },
-        "tracking": {
-            "radius_km": 30,
-            "update_interval_seconds": 10,
-        },
-        "database": {"path": "data/lara_flights_paris.db"},
-        "api": {
-            "opensky_url": "https://opensky-network.org/api/states/all",
-            "timeout_seconds": 10,
-            "credentials_path": "custom_credentials.json",
-        },
-        "logging": {
-            "level": "INFO",
-            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        },
-    })
+    return str(
+        {
+            "location": {
+                "latitude": 48.8566,
+                "longitude": 2.3522,
+                "name": "Paris, France",
+            },
+            "tracking": {
+                "radius_km": 30,
+                "update_interval_seconds": 10,
+            },
+            "database": {"path": "data/lara_flights_paris.db"},
+            "api": {
+                "opensky_url": "https://opensky-network.org/api/states/all",
+                "timeout_seconds": 10,
+                "credentials_path": "custom_credentials.json",
+            },
+            "logging": {
+                "level": "INFO",
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            },
+        }
+    )
 
 
 class TestConfig:
