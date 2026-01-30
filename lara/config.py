@@ -8,7 +8,7 @@ from typing import Dict, Any
 
 
 class Constants:
-    """ Constant values, meant not to be changed, as they represent physical world."""
+    """Constant values, meant not to be changed, as they represent physical world."""
 
     EARTH_RADIUS_KM = 6371  # Approximate Earth radius
     METERS_TO_FEET = 3.28084  # Conversion meters to feet
