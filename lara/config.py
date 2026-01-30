@@ -26,7 +26,6 @@ class Settings():
         (9000, 12000, "9000-12000m"),
         (12000, float("inf"), "12000m+"),
     ]
-    SCHEMA_VERSION = "1.0.0"                # 
 
     """Analysis Settings"""
     HEADING_TOLERANCE_DEG: float = 20.0     # Corridor analysis Positions within ±20° are same direction
