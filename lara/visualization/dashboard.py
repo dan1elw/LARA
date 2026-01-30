@@ -79,8 +79,14 @@ class Dashboard:
         )
         heatmap.close()
 
-        # 5. Generate index page
-        print("\n5. Generating dashboard index...")
+        # 5. Live View
+        print("\n5. Generating live view...")
+        plotter = FlightPlotter(self.db_path, self.center_lat, self.center_lon)
+        plotter.plot_live(output_file=str(self.output_dir / "live_view.html"))
+        plotter.close()
+
+        # 6. Generate index page
+        print("\n6. Generating dashboard index...")
         self._generate_index_page()
 
         print("\n" + "=" * 70)
@@ -222,18 +228,25 @@ class Dashboard:
                 <a href="traffic_heatmap.html" class="btn">View Heatmap</a>
             </div>
             
+            <div class="card" onclick="window.location='altitude_heatmap.html'">
+                <div class="icon">📊</div>
+                <h2>Altitude Analysis</h2>
+                <p>Heatmap weighted by altitude. Shows where aircraft fly lowest (potential noise impact).</p>
+                <a href="altitude_heatmap.html" class="btn">View Analysis</a>
+            </div>
+
             <div class="card" onclick="window.location='recent_flights_24h.html'">
                 <div class="icon">✈️</div>
                 <h2>Recent Flights (24h)</h2>
                 <p>All flights detected in the last 24 hours with complete flight paths and position data.</p>
                 <a href="recent_flights_24h.html" class="btn">View Flights</a>
             </div>
-            
-            <div class="card" onclick="window.location='altitude_heatmap.html'">
-                <div class="icon">📊</div>
-                <h2>Altitude Analysis</h2>
-                <p>Heatmap weighted by altitude. Shows where aircraft fly lowest (potential noise impact).</p>
-                <a href="altitude_heatmap.html" class="btn">View Analysis</a>
+
+            <div class="card" onclick="window.location='live_view.html'">
+                <div class="icon">🔴</div>
+                <h2>Live View</h2>
+                <p>Real-time flight tracking and visualization.</p>
+                <a href="live_view.html" class="btn">View Live</a>
             </div>
         </div>
     </div>
