@@ -5,6 +5,7 @@ Specialized plotting for individual flights and routes, including live tracking.
 
 import sqlite3
 from .map_generator import MapGenerator
+from lara.utils import get_bounding_box
 
 
 class FlightPlotter:
@@ -186,11 +187,9 @@ class FlightPlotter:
             Anonymous API access has strict rate limits (max ~100 requests/day).
             For production use, consider server-side proxying with credentials.
         """
-        print(f"🔴 Generating live flight tracking map...")
+        print("🔴 Generating live flight tracking map...")
 
         # Calculate bounding box for API query
-        from lara.utils import get_bounding_box
-
         lat_min, lon_min, lat_max, lon_max = get_bounding_box(
             self.center_lat, self.center_lon, self.radius_km
         )
@@ -203,8 +202,8 @@ class FlightPlotter:
             f.write(html_content)
 
         print(f"✅ Live tracking map saved to: {output_file}")
-        print(f"   Updates every 10 seconds using OpenSky Network API")
-        print(f"   ⚠️  Anonymous access is rate-limited (~100 requests/day)")
+        print("   Updates every 10 seconds using OpenSky Network API")
+        print("   ⚠️  Anonymous access is rate-limited (~100 requests/day)")
 
     def _generate_live_html(
         self, lat_min: float, lon_min: float, lat_max: float, lon_max: float

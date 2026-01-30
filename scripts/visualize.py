@@ -72,26 +72,16 @@ Examples:
         help="Generate complete visualization dashboard",
     )
     viz_group.add_argument(
-        "--flight",
-        type=int,
-        metavar="FLIGHT_ID",
-        help="Plot single flight by ID"
+        "--flight", type=int, metavar="FLIGHT_ID", help="Plot single flight by ID"
     )
     viz_group.add_argument(
-        "--recent",
-        type=int,
-        metavar="HOURS",
-        help="Plot flights from last N hours"
+        "--recent", type=int, metavar="HOURS", help="Plot flights from last N hours"
     )
     viz_group.add_argument(
-        "--heatmap",
-        action="store_true", 
-        help="Generate traffic density heatmap"
+        "--heatmap", action="store_true", help="Generate traffic density heatmap"
     )
     viz_group.add_argument(
-        "--live",
-        action="store_true", 
-        help="Generate live flight tracking map"
+        "--live", action="store_true", help="Generate live flight tracking map"
     )
     viz_group.add_argument(
         "--altitude-heatmap",
