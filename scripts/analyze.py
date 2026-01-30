@@ -18,7 +18,7 @@ from lara.tracking import Config
 from lara.analysis import FlightAnalyzer
 
 
-def main(config_path: str = "lara/config.yaml"):
+def main(config_path: str = "data/config.yaml"):
     """Main entry point for analyzer."""
     parser = argparse.ArgumentParser(
         description="LARA Flight Data Analyzer - Advanced pattern analysis"

@@ -123,7 +123,7 @@ Examples:
     args = parser.parse_args()
 
     # Load configuration
-    config = Config("lara/config.yaml")
+    config = Config("data/config.yaml")
 
     # Get database path
     db_path = args.db if args.db else config.db_path

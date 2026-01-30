@@ -25,7 +25,7 @@ def main():
     parser.add_argument(
         "--config",
         type=str,
-        default="lara/config.yaml",
+        default="data/config.yaml",
         help="Path to configuration file (default: config.yaml)",
     )
 
