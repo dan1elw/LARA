@@ -5,11 +5,6 @@ LARA Configuration Management
 import yaml
 import os
 from typing import Dict, Any
-from .tracking.constants import (
-    DEFAULT_DB_PATH,
-    DEFAULT_RADIUS_KM,
-    DEFAULT_UPDATE_INTERVAL,
-)
 
 
 class Config:
@@ -42,15 +37,15 @@ class Config:
         """Get default configuration."""
         return {
             "location": {
-                "latitude": 49.3508,
-                "longitude": 8.1364,
-                "name": "Neustadt an der Weinstraße, Germany",
+                "latitude": 52.516257,
+                "longitude": 13.377525,
+                "name": "Berlin Brandenburger Tor, Germany",
             },
             "tracking": {
-                "radius_km": DEFAULT_RADIUS_KM,
-                "update_interval_seconds": DEFAULT_UPDATE_INTERVAL,
+                "radius_km": 25,
+                "update_interval_seconds": 15,
             },
-            "database": {"path": DEFAULT_DB_PATH},
+            "database": {"path": "data/lara_flights_berlin.db"},
             "api": {
                 "opensky_url": "https://opensky-network.org/api/states/all",
                 "timeout_seconds": 10,
