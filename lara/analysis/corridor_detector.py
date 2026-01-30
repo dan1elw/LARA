@@ -15,14 +15,13 @@ similar routes in the same general direction.
 from typing import Dict, Any, List, Tuple, Optional
 from dataclasses import dataclass
 from collections import defaultdict
-import math
 
 from lara.analysis.constants import (
     HEADING_TOLERANCE_DEG,
     PROXIMITY_THRESHOLD_KM,
     MIN_CORRIDOR_LENGTH_KM,
     MIN_LINEARITY_SCORE,
-    MIN_FLIGHTS_FOR_CORRIDOR
+    MIN_FLIGHTS_FOR_CORRIDOR,
 )
 
 from ..utils import haversine_distance, perpendicular_distance, calculate_bearing
@@ -379,8 +378,7 @@ class CorridorDetector:
 
         # Calculate perpendicular distances for width estimation
         distances = [
-            perpendicular_distance(p.latitude, p.longitude, line)
-            for p in positions
+            perpendicular_distance(p.latitude, p.longitude, line) for p in positions
         ]
         width_km = 2 * (sum(distances) / len(distances))  # Average distance * 2
 

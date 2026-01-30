@@ -15,7 +15,7 @@ from requests.exceptions import RequestException
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from lara.tracking.collector import FlightCollector
-from lara.tracking.config import Config
+from lara.config import Config
 
 
 @pytest.fixture

@@ -13,12 +13,12 @@ MAP_TILE_URLS = {
 
 # Color schemes
 ALTITUDE_COLORS = {
-    "very_low":  "#ff3b3b", # 0 - 1000 m
-    "low":       "#ff7a18", # 1000 - 3000 m
-    "medium":    "#f5e663", # 3000 - 6000 m
-    "high":      "#00e5a8", # 6000 - 9000 m
-    "very_high": "#00b4ff", # 9000 - 12000 m
-    "cruise":    "#7c3aed", # 12000+ m
+    "very_low": "#ff3b3b",  # 0 - 1000 m
+    "low": "#ff7a18",  # 1000 - 3000 m
+    "medium": "#f5e663",  # 3000 - 6000 m
+    "high": "#00e5a8",  # 6000 - 9000 m
+    "very_high": "#00b4ff",  # 9000 - 12000 m
+    "cruise": "#7c3aed",  # 12000+ m
 }
 
 RANKED_COLORS = [
@@ -30,11 +30,11 @@ RANKED_COLORS = [
 ]
 
 HEATMAP_GRADIENT = {  # Neon Plasma
-    0.0:  "#120018",
+    0.0: "#120018",
     0.25: "#6a00ff",
-    0.5:  "#ff2fd2",
+    0.5: "#ff2fd2",
     0.75: "#ff9f1c",
-    1.0:  "#fff200",
+    1.0: "#fff200",
 }
 
 # Flight path colors

@@ -4,7 +4,9 @@ Analysis Constants
 
 # Corridor analysis
 HEADING_TOLERANCE_DEG: float = 20.0  # Positions within ±20° are same direction
-PROXIMITY_THRESHOLD_KM: float = 10.0  # Positions within 10km can belong to same corridor
+PROXIMITY_THRESHOLD_KM: float = (
+    10.0  # Positions within 10km can belong to same corridor
+)
 MIN_CORRIDOR_LENGTH_KM: float = 3.0  # Minimum corridor length (lowered to 3km)
 MIN_LINEARITY_SCORE: float = 0.3  # Minimum linearity (0-1, lowered to 0.5)
 MIN_FLIGHTS_FOR_CORRIDOR: int = 15  # Minimum unique flights to qualify as corridor

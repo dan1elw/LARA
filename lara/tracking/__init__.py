@@ -12,13 +12,13 @@ Main Classes:
 
 Example:
     >>> from lara.tracking import Config, FlightCollector
-    >>> config = Config('lara/tracking/config.yaml')
+    >>> config = Config('lara/config.yaml')
     >>> collector = FlightCollector(config)
     >>> collector.run()
 """
 
 # Core tracking components
-from .config import Config
+from ..config import Config
 from .database import FlightDatabase
 from .collector import FlightCollector
 from .reader import FlightReader

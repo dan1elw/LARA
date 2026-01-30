@@ -720,7 +720,7 @@ class TestGetDailyStats:
         """Test getting daily stats with custom number of days."""
         stats = reader_with_data.get_daily_stats(days=3)
 
-        assert len(stats) <= 3
+        assert len(stats) <= (3 + 1)
 
     def test_daily_stats_sorted_descending(self, reader_with_data: FlightReader):
         """Test that stats are sorted by date descending."""

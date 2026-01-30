@@ -5,13 +5,17 @@ LARA Configuration Management
 import yaml
 import os
 from typing import Dict, Any
-from .constants import DEFAULT_DB_PATH, DEFAULT_RADIUS_KM, DEFAULT_UPDATE_INTERVAL
+from .tracking.constants import (
+    DEFAULT_DB_PATH,
+    DEFAULT_RADIUS_KM,
+    DEFAULT_UPDATE_INTERVAL,
+)
 
 
 class Config:
     """Configuration manager for LARA application."""
 
-    def __init__(self, config_path: str = "lara/tracking/config.yaml"):
+    def __init__(self, config_path: str = "lara/config.yaml"):
         """
         Initialize configuration.
 

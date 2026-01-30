@@ -58,7 +58,7 @@ def main():
     if args.db:
         db_path = args.db
     else:
-        config = Config("lara/tracking/config.yaml")
+        config = Config("lara/config.yaml")
         db_path = config.db_path
 
     # Create output filename

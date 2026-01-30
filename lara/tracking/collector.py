@@ -7,7 +7,7 @@ import time
 from datetime import datetime
 from typing import List, Optional, Dict, Any
 from .database import FlightDatabase
-from .config import Config
+from ..config import Config
 from ..utils import haversine_distance, get_bounding_box, parse_state_vector
 from .constants import MIN_UPDATE_INTERVAL
 from .auth import create_auth_from_config

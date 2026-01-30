@@ -24,7 +24,7 @@ def main():
     parser.add_argument(
         "--config",
         type=str,
-        default="lara/tracking/config.yaml",
+        default="lara/config.yaml",
         help="Path to configuration file (default: config.yaml)",
     )
 
