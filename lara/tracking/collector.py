@@ -7,9 +7,8 @@ import time
 from datetime import datetime
 from typing import List, Optional, Dict, Any
 from .database import FlightDatabase
-from .config import Config
-from .utils import haversine_distance, get_bounding_box, parse_state_vector
-from .constants import MIN_UPDATE_INTERVAL
+from lara.config import Config, Settings, Constants
+from lara.utils import haversine_distance, get_bounding_box, parse_state_vector
 from .auth import create_auth_from_config
 
 
@@ -28,7 +27,7 @@ class FlightCollector:
         self.home_lat = config.home_latitude
         self.home_lon = config.home_longitude
         self.radius_km = config.radius_km
-        self.update_interval = max(config.update_interval, MIN_UPDATE_INTERVAL)
+        self.update_interval = max(config.update_interval, Settings.MIN_UPDATE_INTERVAL)
         self.api_url = config.api_url
         self.api_timeout = config.api_timeout
 
@@ -238,9 +237,7 @@ class FlightCollector:
             print(f"{'N/A':>6s} m | ", end="")
 
         if velocity is not None:
-            from .constants import MS_TO_KMH
-
-            print(f"{velocity * MS_TO_KMH:5.1f} km/h", end="")
+            print(f"{velocity * Constants.MS_TO_KMH:5.1f} km/h", end="")
         else:
             print(f"{'N/A':>5s} km/h", end="")
 

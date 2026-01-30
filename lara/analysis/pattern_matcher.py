@@ -4,8 +4,7 @@ Identifies recurring flight routes and patterns.
 """
 
 from typing import Dict, Any, List
-
-from .constants import MIN_PATTERN_OCCURRENCES
+from lara.config import Settings
 
 
 class PatternMatcher:
@@ -62,7 +61,7 @@ class PatternMatcher:
             ORDER BY occurrence_count DESC
             LIMIT 50
         """,
-            (MIN_PATTERN_OCCURRENCES,),
+            (Settings.MIN_PATTERN_OCCURRENCES,),
         )
 
         recurring = []

@@ -4,7 +4,7 @@ Provides comprehensive statistical analysis of flight data.
 """
 
 from typing import Dict, Any, List
-from .constants import ALTITUDE_CLASSES, DISTANCE_CLASSES, DAYS_FOR_TREND_ANALYSIS
+from lara.config import Settings
 
 
 class StatisticsEngine:
@@ -58,7 +58,7 @@ class StatisticsEngine:
         cursor = self.conn.cursor()
 
         distribution = []
-        for class_name, (min_alt, max_alt) in ALTITUDE_CLASSES.items():
+        for class_name, (min_alt, max_alt) in Settings.ALTITUDE_CLASSES.items():
             if max_alt == float("inf"):
                 cursor.execute(
                     """
@@ -95,7 +95,7 @@ class StatisticsEngine:
         cursor = self.conn.cursor()
 
         distribution = []
-        for class_name, (min_dist, max_dist) in DISTANCE_CLASSES.items():
+        for class_name, (min_dist, max_dist) in Settings.DISTANCE_CLASSES.items():
             if max_dist == float("inf"):
                 cursor.execute(
                     """
@@ -168,7 +168,7 @@ class StatisticsEngine:
         return [dict(row) for row in cursor.fetchall()]
 
     def analyze_temporal_patterns(
-        self, days: int = DAYS_FOR_TREND_ANALYSIS
+        self, days: int = Settings.DAYS_FOR_TREND_ANALYSIS
     ) -> Dict[str, Any]:
         """Analyze temporal trends."""
         cursor = self.conn.cursor()

@@ -9,8 +9,10 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from lara.tracking.utils import (
+from lara.utils import (
     haversine_distance,
+    calculate_bearing,
+    perpendicular_distance,
     get_bounding_box,
     format_altitude,
     format_speed,
@@ -18,6 +20,8 @@ from lara.tracking.utils import (
     validate_coordinates,
     parse_state_vector,
 )
+
+from lara.analysis.corridor_detector import LineSegment
 
 
 class TestHaversineDistance:
@@ -38,6 +42,46 @@ class TestHaversineDistance:
         """Test with negative coordinates."""
         dist = haversine_distance(-33.8688, 151.2093, -37.8136, 144.9631)
         assert dist > 0  # Sydney to Melbourne
+
+    def test_bearing_calculation(self):
+        """Test bearing/heading calculation."""
+
+        # North: should be ~0°
+        bearing = calculate_bearing(49.0, 8.0, 50.0, 8.0)
+        assert -5 < bearing < 5 or bearing > 355
+
+        # East: should be ~90°
+        bearing = calculate_bearing(49.0, 8.0, 49.0, 9.0)
+        assert 85 < bearing < 95
+
+        # South: should be ~180°
+        bearing = calculate_bearing(50.0, 8.0, 49.0, 8.0)
+        assert 175 < bearing < 185
+
+        # West: should be ~270°
+        bearing = calculate_bearing(49.0, 9.0, 49.0, 8.0)
+        assert 265 < bearing < 275
+
+    def test_perpendicular_distance(self):
+        """Test perpendicular distance calculation."""
+
+        # Create vertical line
+        line = LineSegment(
+            start_lat=49.0,
+            start_lon=8.0,
+            end_lat=50.0,
+            end_lon=8.0,
+            heading=0.0,
+            length_km=111.0,
+        )
+
+        # Point on the line
+        dist = perpendicular_distance(49.5, 8.0, line)
+        assert dist < 0.1  # Should be very close to 0
+
+        # Point 0.1 degrees away (~ 11 km)
+        dist = perpendicular_distance(49.5, 8.1, line)
+        assert 10 < dist < 12
 
 
 class TestBoundingBox:

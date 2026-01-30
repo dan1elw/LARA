@@ -30,7 +30,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from lara.tracking import Config
+from lara.config import Config
 from lara.visualization import MapGenerator, FlightPlotter, HeatmapGenerator, Dashboard
 from lara.analysis import FlightAnalyzer
 
@@ -123,7 +123,7 @@ Examples:
     args = parser.parse_args()
 
     # Load configuration
-    config = Config("lara/tracking/config.yaml")
+    config = Config("data/config.yaml")
 
     # Get database path
     db_path = args.db if args.db else config.db_path

@@ -12,25 +12,19 @@ Main Classes:
 
 Example:
     >>> from lara.tracking import Config, FlightCollector
-    >>> config = Config('lara/tracking/config.yaml')
+    >>> config = Config('lara/config.yaml')
     >>> collector = FlightCollector(config)
     >>> collector.run()
 """
 
 # Core tracking components
-from .config import Config
 from .database import FlightDatabase
 from .collector import FlightCollector
 from .reader import FlightReader
 from .auth import OpenSkyAuth, OpenSkyBasicAuth, create_auth_from_config
 
-# Utilities
-from . import utils
-from . import constants
-
 __all__ = [
     # Main classes
-    "Config",
     "FlightDatabase",
     "FlightCollector",
     "FlightReader",
@@ -38,7 +32,4 @@ __all__ = [
     "OpenSkyAuth",
     "OpenSkyBasicAuth",
     "create_auth_from_config",
-    # Modules
-    "utils",
-    "constants",
 ]

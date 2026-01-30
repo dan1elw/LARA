@@ -34,15 +34,10 @@ from .flight_plotter import FlightPlotter
 from .heatmap_generator import HeatmapGenerator
 from .dashboard import Dashboard
 
-# Utilities
-from . import constants
-
 __all__ = [
     # Main classes
     "MapGenerator",
     "FlightPlotter",
     "HeatmapGenerator",
     "Dashboard",
-    # Modules
-    "constants",
 ]

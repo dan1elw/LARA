@@ -49,6 +49,8 @@ class FlightAnalyzer:
         print("🔬 LARA COMPREHENSIVE ANALYSIS")
         print("=" * 70)
 
+        print(f"\n   Database: {self.db_path}")
+
         results = {
             "metadata": {
                 "analysis_date": datetime.now().isoformat(),

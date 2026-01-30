@@ -37,6 +37,7 @@ data/*.db
 data/*.db-journal
 *.log
 data/*.json
+data/*.yaml
 
 # Testing
 .pytest_cache/

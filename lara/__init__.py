@@ -10,23 +10,31 @@ Components:
     - visualization: Interactive map generation and dashboards
 
 Example:
-    >>> from lara.tracking import Config, FlightCollector
+    >>> from lara.tracking import FlightCollector
+    >>> from lara import Config
     >>> config = Config()
     >>> collector = FlightCollector(config)
     >>> collector.run()
 """
 
-__version__ = "v0.1.1"
-__author__ = "LARA Project"
-__license__ = "MIT"
-
 # Component imports for easy access
 from . import tracking
 from . import analysis
 from . import visualization
+from . import utils
+from . import config
+
+LARA_VERSION = "v0.1.1"
+DB_SCHEMA_VERSION = "v1.0"
+
+__version__ = LARA_VERSION
+__author__ = "LARA Project"
+__license__ = "MIT"
 
 __all__ = [
     "tracking",
     "analysis",
     "visualization",
+    "utils",
+    "config",
 ]

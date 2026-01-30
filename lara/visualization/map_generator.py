@@ -8,14 +8,13 @@ Updated to properly visualize linear flight corridors instead of circular cluste
 import folium
 from typing import Dict, Any, List
 
-from .constants import (
-    DEFAULT_MAP_STYLE,
-    DEFAULT_ZOOM,
-    MAP_TILE_URLS,
-    ALTITUDE_COLORS,
-    FLIGHT_PATH_WEIGHT,
-    FLIGHT_PATH_OPACITY,
-)
+from lara.config import Settings, Colors
+
+MAP_TILE_URLS = {
+    "CartoDB.DarkMatter": "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    "CartoDB.Positron": "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    "OpenStreetMap": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+}
 
 
 class MapGenerator:
@@ -33,8 +32,8 @@ class MapGenerator:
         self,
         center_lat: float,
         center_lon: float,
-        zoom: int = DEFAULT_ZOOM,
-        style: str = DEFAULT_MAP_STYLE,
+        zoom: int = Settings.DEFAULT_ZOOM,
+        style: str = Settings.DEFAULT_MAP_STYLE,
     ):
         """
         Initialize map generator.
@@ -109,8 +108,8 @@ class MapGenerator:
         folium.PolyLine(
             coords,
             color=color,
-            weight=FLIGHT_PATH_WEIGHT,
-            opacity=FLIGHT_PATH_OPACITY,
+            weight=Settings.FLIGHT_PATH_WEIGHT,
+            opacity=Settings.FLIGHT_PATH_OPACITY,
             popup=f"{flight_info.get('callsign', 'Unknown')} - {avg_altitude:.0f}m",
             tooltip=flight_info.get("callsign", "Unknown"),
         ).add_to(self.map)
@@ -299,17 +298,17 @@ class MapGenerator:
             Color hex code
         """
         if altitude_m < 1000:
-            return ALTITUDE_COLORS["very_low"]
+            return Colors.ALTITUDE_COLORS["very_low"]
         elif altitude_m < 3000:
-            return ALTITUDE_COLORS["low"]
+            return Colors.ALTITUDE_COLORS["low"]
         elif altitude_m < 6000:
-            return ALTITUDE_COLORS["medium"]
+            return Colors.ALTITUDE_COLORS["medium"]
         elif altitude_m < 9000:
-            return ALTITUDE_COLORS["high"]
+            return Colors.ALTITUDE_COLORS["high"]
         elif altitude_m < 12000:
-            return ALTITUDE_COLORS["very_high"]
+            return Colors.ALTITUDE_COLORS["very_high"]
         else:
-            return ALTITUDE_COLORS["cruise"]
+            return Colors.ALTITUDE_COLORS["cruise"]
 
     def _get_rank_color(self, rank: int) -> str:
         """
@@ -323,14 +322,7 @@ class MapGenerator:
         Returns:
             Color hex code
         """
-        colors = [
-            "#e74c3c",  # Rank 1 - Red (highest traffic)
-            "#e67e22",  # Rank 2 - Orange
-            "#f39c12",  # Rank 3 - Yellow
-            "#2ecc71",  # Rank 4-5 - Green
-            "#3498db",  # Rank 6+ - Blue
-        ]
-        return colors[min(rank - 1, len(colors) - 1)]
+        return Colors.RANKED_COLORS[min(rank - 1, len(Colors.RANKED_COLORS) - 1)]
 
     def save(self, filename: str):
         """

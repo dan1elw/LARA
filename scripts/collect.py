@@ -13,7 +13,8 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from lara.tracking import Config, FlightCollector
+from lara.tracking import FlightCollector
+from lara.config import Config
 
 
 def main():
@@ -24,7 +25,7 @@ def main():
     parser.add_argument(
         "--config",
         type=str,
-        default="lara/tracking/config.yaml",
+        default="data/config.yaml",
         help="Path to configuration file (default: config.yaml)",
     )
 

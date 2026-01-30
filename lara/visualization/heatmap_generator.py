@@ -6,7 +6,7 @@ Creates density heatmaps of flight activity.
 from folium import plugins
 import sqlite3
 
-from .constants import HEATMAP_GRADIENT
+from lara.config import Colors
 
 
 class HeatmapGenerator:
@@ -68,7 +68,7 @@ class HeatmapGenerator:
             max_zoom=18,
             radius=10,
             blur=25,
-            gradient=HEATMAP_GRADIENT,
+            gradient=Colors.HEATMAP_GRADIENT,
         ).add_to(map_gen.map)
 
         # Save
@@ -108,7 +108,11 @@ class HeatmapGenerator:
 
         # Add heatmap
         plugins.HeatMap(
-            heat_data, min_opacity=0.3, radius=10, blur=25, gradient=HEATMAP_GRADIENT
+            heat_data,
+            min_opacity=0.3,
+            radius=10,
+            blur=25,
+            gradient=Colors.HEATMAP_GRADIENT,
         ).add_to(map_gen.map)
 
         # Save
