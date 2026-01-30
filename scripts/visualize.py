@@ -81,6 +81,9 @@ Examples:
         "--heatmap", action="store_true", help="Generate traffic density heatmap"
     )
     viz_group.add_argument(
+        "--live", action="store_true", help="Generate live flight tracking map"
+    )
+    viz_group.add_argument(
         "--altitude-heatmap",
         action="store_true",
         help="Generate altitude-weighted heatmap",
@@ -164,6 +167,13 @@ Examples:
             output = args.output or f"recent_{args.recent}h.html"
             plotter = FlightPlotter(db_path, center_lat, center_lon)
             plotter.plot_recent_flights(args.recent, output)
+            plotter.close()
+
+        elif args.live:
+            # Plot live flights
+            output = args.output or "live_flights.html"
+            plotter = FlightPlotter(db_path, center_lat, center_lon)
+            plotter.plot_live(output)
             plotter.close()
 
         elif args.heatmap:

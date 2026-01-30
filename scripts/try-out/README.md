@@ -1,1 +1,0 @@
-this ```try``` directory is for testing purpose only and to try out some things, before beginning with the "real" work on the component.
