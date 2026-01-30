@@ -10,7 +10,7 @@ from typing import Dict, Any
 class Config:
     """Configuration manager for LARA application."""
 
-    def __init__(self, config_path: str = "lara/config.yaml"):
+    def __init__(self, config_path: str = None):
         """
         Initialize configuration.
 
@@ -22,16 +22,41 @@ class Config:
 
     def _load_config(self) -> Dict[str, Any]:
         """Load configuration from YAML file."""
-        if not os.path.exists(self.config_path):
+        if (self.config_path is None) or (not os.path.exists(self.config_path)):
             return self._get_default_config()
 
         try:
             with open(self.config_path, "r") as f:
                 config = yaml.safe_load(f)
-                return config if config else self._get_default_config()
+                if not self._validate_config(config):
+                    return self._get_default_config()
+                else:
+                    return config
         except Exception as e:
             print(f"Warning: Could not load config file: {e}")
             return self._get_default_config()
+        
+    def _validate_config(self, config: Dict[str, Any]) -> bool:
+        """Validate configuration structure and types."""
+        # Basic validation can be extended as needed
+        try:
+            assert "location" in config
+            assert "latitude" in config["location"]
+            assert "longitude" in config["location"]
+            assert isinstance(config["location"]["latitude"], (float, int))
+            assert isinstance(config["location"]["longitude"], (float, int))
+
+            assert "tracking" in config
+            assert "radius_km" in config["tracking"]
+            assert isinstance(config["tracking"]["radius_km"], (float, int))
+
+            assert "database" in config
+            assert "path" in config["database"]
+            assert isinstance(config["database"]["path"], str)
+
+            return True
+        except Exception:
+            return False
 
     def _get_default_config(self) -> Dict[str, Any]:
         """Get default configuration."""
