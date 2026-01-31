@@ -165,14 +165,8 @@ class Config:
             },
             "database": {"path": "data/lara_flights_berlin.db"},
             "api": {
-                "opensky_url": "https://opensky-network.org/api/states/all",
-                "timeout_seconds": 10,
                 # OAuth2 credentials (new authentication method)
                 "credentials_path": None,  # Path to credentials.json from OpenSky
-            },
-            "logging": {
-                "level": "INFO",
-                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
             },
         }
 
@@ -213,16 +207,6 @@ class Config:
     def db_path(self) -> str:
         """Get database path."""
         return self._config["database"]["path"]
-
-    @property
-    def api_url(self) -> str:
-        """Get OpenSky API URL."""
-        return self._config["api"]["opensky_url"]
-
-    @property
-    def api_timeout(self) -> int:
-        """Get API timeout in seconds."""
-        return self._config["api"]["timeout_seconds"]
 
     def get(self, key: str, default: Any = None) -> Any:
         """
