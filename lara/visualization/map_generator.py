@@ -100,8 +100,10 @@ class MapGenerator:
         if not coords:
             return
 
+        # Filter out None values before calculating average
+        altitudes = [p["altitude_m"] for p in positions if p.get("altitude_m") is not None]
+        avg_altitude = sum(altitudes) / len(altitudes) if altitudes else 0.0
         # Color by altitude
-        avg_altitude = sum(p.get("altitude_m", 0) for p in positions) / len(positions)
         color = self._get_altitude_color(avg_altitude)
 
         # Create polyline for flight path
