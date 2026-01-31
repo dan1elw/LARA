@@ -61,7 +61,15 @@ Examples:
 
     # Database options
     parser.add_argument(
-        "--db", type=str, help="Path to database file (default: from config.yaml)"
+        "--config",
+        type=str,
+        default="data/config.yaml",
+        help="Path to config file (default: data/config.yaml)",
+    )
+    parser.add_argument(
+        "--db",
+        type=str,
+        help="Path to database file (default: from config.yaml)",
     )
 
     # Visualization type
@@ -72,16 +80,26 @@ Examples:
         help="Generate complete visualization dashboard",
     )
     viz_group.add_argument(
-        "--flight", type=int, metavar="FLIGHT_ID", help="Plot single flight by ID"
+        "--flight",
+        type=int,
+        metavar="FLIGHT_ID",
+        help="Plot single flight by ID",
     )
     viz_group.add_argument(
-        "--recent", type=int, metavar="HOURS", help="Plot flights from last N hours"
+        "--recent",
+        type=int,
+        metavar="HOURS",
+        help="Plot flights from last N hours",
     )
     viz_group.add_argument(
-        "--heatmap", action="store_true", help="Generate traffic density heatmap"
+        "--heatmap",
+        action="store_true",
+        help="Generate traffic density heatmap",
     )
     viz_group.add_argument(
-        "--live", action="store_true", help="Generate live flight tracking map"
+        "--live",
+        action="store_true",
+        help="Generate live flight tracking map"
     )
     viz_group.add_argument(
         "--altitude-heatmap",
@@ -126,7 +144,7 @@ Examples:
     args = parser.parse_args()
 
     # Load configuration
-    config = Config("data/config.yaml")
+    config = Config(args.config)
 
     # Get database path
     db_path = args.db if args.db else config.db_path
@@ -233,5 +251,5 @@ Examples:
 
 if __name__ == "__main__":
     # Visualize dashboard for testing
-    sys.argv = ["scripts/visualize.py", "--dashboard"]
+    sys.argv = ["scripts/visualize.py", "--dashboard", "--config", "docu/example/config.yaml", "--output-dir", "docu/example/html/"]
     main()

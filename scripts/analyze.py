@@ -14,20 +14,30 @@ from datetime import datetime
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from lara.tracking import Config
+from lara.config import Config
 from lara.analysis import FlightAnalyzer
 
 
-def main(config_path: str = "data/config.yaml"):
+def main():
     """Main entry point for analyzer."""
     parser = argparse.ArgumentParser(
         description="LARA Flight Data Analyzer - Advanced pattern analysis"
     )
     parser.add_argument(
-        "--db", type=str, help="Path to database file (default: from config.yaml)"
+        "--config",
+        type=str,
+        default="data/config.yaml",
+        help="Path to config file (default: data/config.yaml)",
     )
     parser.add_argument(
-        "--output", type=str, help="Output file for report (default: auto-generated)"
+        "--db",
+        type=str,
+        help="Path to database file (default: from config.yaml)"
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        help="Output file for report (default: auto-generated)"
     )
     parser.add_argument(
         "--format",
@@ -37,13 +47,19 @@ def main(config_path: str = "data/config.yaml"):
         help="Report format (default: json)",
     )
     parser.add_argument(
-        "--corridors-only", action="store_true", help="Run only corridor analysis"
+        "--corridors-only",
+        action="store_true",
+        help="Run only corridor analysis"
     )
     parser.add_argument(
-        "--patterns-only", action="store_true", help="Run only pattern analysis"
+        "--patterns-only",
+        action="store_true",
+        help="Run only pattern analysis"
     )
     parser.add_argument(
-        "--stats-only", action="store_true", help="Run only statistical analysis"
+        "--stats-only",
+        action="store_true",
+        help="Run only statistical analysis"
     )
     parser.add_argument(
         "--grid-size",
@@ -58,7 +74,7 @@ def main(config_path: str = "data/config.yaml"):
     if args.db:
         db_path = args.db
     else:
-        config = Config(config_path)
+        config = Config(args.config)
         db_path = config.db_path
 
     # Create output filename
@@ -105,4 +121,6 @@ def main(config_path: str = "data/config.yaml"):
 
 
 if __name__ == "__main__":
+    # Analyze Example data
+    sys.argv = ["scripts/analyze.py", "--config", "docu/example/config.yaml", "--output", "docu/example/lara_analysis_berlin.json"]
     main()
