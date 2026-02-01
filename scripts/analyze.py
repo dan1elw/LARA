@@ -30,14 +30,10 @@ def main():
         help="Path to config file (default: data/config.yaml)",
     )
     parser.add_argument(
-        "--db",
-        type=str,
-        help="Path to database file (default: from config.yaml)"
+        "--db", type=str, help="Path to database file (default: from config.yaml)"
     )
     parser.add_argument(
-        "--output",
-        type=str,
-        help="Output file for report (default: auto-generated)"
+        "--output", type=str, help="Output file for report (default: auto-generated)"
     )
     parser.add_argument(
         "--format",
@@ -47,19 +43,13 @@ def main():
         help="Report format (default: json)",
     )
     parser.add_argument(
-        "--corridors-only",
-        action="store_true",
-        help="Run only corridor analysis"
+        "--corridors-only", action="store_true", help="Run only corridor analysis"
     )
     parser.add_argument(
-        "--patterns-only",
-        action="store_true",
-        help="Run only pattern analysis"
+        "--patterns-only", action="store_true", help="Run only pattern analysis"
     )
     parser.add_argument(
-        "--stats-only",
-        action="store_true",
-        help="Run only statistical analysis"
+        "--stats-only", action="store_true", help="Run only statistical analysis"
     )
     parser.add_argument(
         "--grid-size",
@@ -122,5 +112,11 @@ def main():
 
 if __name__ == "__main__":
     # Analyze Example data
-    sys.argv = ["scripts/analyze.py", "--config", "docu/example/config.yaml", "--output", "docu/example/lara_analysis_berlin.json"]
+    sys.argv = [
+        "scripts/analyze.py",
+        "--config",
+        "docu/example/config.yaml",
+        "--output",
+        "docu/example/lara_analysis_berlin.json",
+    ]
     main()

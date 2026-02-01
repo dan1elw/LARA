@@ -101,7 +101,9 @@ class MapGenerator:
             return
 
         # Filter out None values before calculating average
-        altitudes = [p["altitude_m"] for p in positions if p.get("altitude_m") is not None]
+        altitudes = [
+            p["altitude_m"] for p in positions if p.get("altitude_m") is not None
+        ]
         avg_altitude = sum(altitudes) / len(altitudes) if altitudes else 0.0
         # Color by altitude
         color = self._get_altitude_color(avg_altitude)

@@ -97,9 +97,7 @@ Examples:
         help="Generate traffic density heatmap",
     )
     viz_group.add_argument(
-        "--live",
-        action="store_true",
-        help="Generate live flight tracking map"
+        "--live", action="store_true", help="Generate live flight tracking map"
     )
     viz_group.add_argument(
         "--altitude-heatmap",
@@ -251,5 +249,12 @@ Examples:
 
 if __name__ == "__main__":
     # Visualize dashboard for testing
-    sys.argv = ["scripts/visualize.py", "--dashboard", "--config", "docu/example/config.yaml", "--output-dir", "docu/example/html/"]
+    sys.argv = [
+        "scripts/visualize.py",
+        "--dashboard",
+        "--config",
+        "docu/example/config.yaml",
+        "--output-dir",
+        "docu/example/html/",
+    ]
     main()
