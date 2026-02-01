@@ -136,9 +136,9 @@ LARA automatically identifies:
 
 Detailed documentation is available in the `docs/` directory:
 
-- [Configuration Options](docs/lara_configuration.md)
-- [Usage Examples](docs/lara_example.md)
-- [Database Schema](docs/lara_database_schema.md)
+- [Configuration Options](docu/lara_configuration.md)
+- [Usage Examples](docu/lara_example.md)
+- [Database Schema](docu/lara_database_schema.md)
 
 ---
 
