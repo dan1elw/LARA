@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="lara",
-    version="v0.1.1",
+    version="v1.0.0",
     author="Daniel Weber",
     author_email="dadanielweber@googlemail.com",
     description="Local Air Route Analysis - Track and analyze flights over your location",

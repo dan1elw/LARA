@@ -24,7 +24,7 @@ from . import visualization
 from . import utils
 from . import config
 
-LARA_VERSION = "v0.1.1"
+LARA_VERSION = "v1.0.0"
 DB_SCHEMA_VERSION = "v1.0"
 
 __version__ = LARA_VERSION
