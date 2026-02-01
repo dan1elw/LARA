@@ -1,8 +1,8 @@
 # LARA Configuration File
 
 location:
-  latitude: 50.516257
-  longitude: 8.377525
+  latitude: 52.516257
+  longitude: 13.377525
   name: "Berlin Brandenburger Tor, Germany"
 
 tracking:
