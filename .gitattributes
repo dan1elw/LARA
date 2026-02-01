@@ -1,0 +1,2 @@
+# Oder HTML komplett ignorieren
+*.html linguist-detectable=false
