@@ -11,6 +11,9 @@ from lara.config import Config, Settings, Constants
 from lara.utils import haversine_distance, get_bounding_box, parse_state_vector
 from .auth import create_auth_from_config
 
+OPENSKY_URL = "https://opensky-network.org/api/states/all"
+OPENSKY_TIMEOUT = 10
+
 
 class FlightCollector:
     """Collects and stores flight data from OpenSky Network."""
@@ -28,8 +31,8 @@ class FlightCollector:
         self.home_lon = config.home_longitude
         self.radius_km = config.radius_km
         self.update_interval = max(config.update_interval, Settings.MIN_UPDATE_INTERVAL)
-        self.api_url = config.api_url
-        self.api_timeout = config.api_timeout
+        self.api_url = OPENSKY_URL
+        self.api_timeout = OPENSKY_TIMEOUT
 
         # Initialize OAuth2 authentication
         self.auth = create_auth_from_config(config)

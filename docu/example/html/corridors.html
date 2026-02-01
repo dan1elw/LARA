@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LARA Map</title>
+    <link rel="icon" href="../docu/icon.ico">
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_8beaa02f5a638db906519f3bdd2e4aaa {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_8beaa02f5a638db906519f3bdd2e4aaa" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_8beaa02f5a638db906519f3bdd2e4aaa = L.map(
+                "map_8beaa02f5a638db906519f3bdd2e4aaa",
+                {
+                    center: [52.516257, 13.377525],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 10,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_72c128a868112fd514989d11863d9528 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "LARA Flight Visualization",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_72c128a868112fd514989d11863d9528.addTo(map_8beaa02f5a638db906519f3bdd2e4aaa);
+        
+    
+            var marker_a641f2b96e5327b2090f806d673baa20 = L.marker(
+                [52.516257, 13.377525],
+                {
+}
+            ).addTo(map_8beaa02f5a638db906519f3bdd2e4aaa);
+        
+    
+            var icon_33538e91c17c0aa2703a0a0edafc4ff4 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "home",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_e9ca8d1d958bebfb5daeaf1be1340b9a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_361e68aba305a8a7931c6397a3397fe6 = $(`<div id="html_361e68aba305a8a7931c6397a3397fe6" style="width: 100.0%; height: 100.0%;">Home Location</div>`)[0];
+                popup_e9ca8d1d958bebfb5daeaf1be1340b9a.setContent(html_361e68aba305a8a7931c6397a3397fe6);
+            
+        
+
+        marker_a641f2b96e5327b2090f806d673baa20.bindPopup(popup_e9ca8d1d958bebfb5daeaf1be1340b9a)
+        ;
+
+        
+    
+    
+            marker_a641f2b96e5327b2090f806d673baa20.bindTooltip(
+                `<div>
+                     Your Location
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+                marker_a641f2b96e5327b2090f806d673baa20.setIcon(icon_33538e91c17c0aa2703a0a0edafc4ff4);
+            
+    
+            var poly_line_bf38b8b7a8fc2bade6e817841c7eda18 = L.polyline(
+                [[52.23848947569041, 12.9923], [52.45126887511515, 13.8669]],
+                {"bubblingMouseEvents": true, "color": "#e74c3c", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#e74c3c", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 12}
+            ).addTo(map_8beaa02f5a638db906519f3bdd2e4aaa);
+        
+    
+        var popup_1a50d703d072065a53059bc5fbe37bfb = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_320c31319bc742647f3e947b2039b8cb = $(`<div id="html_320c31319bc742647f3e947b2039b8cb" style="width: 100.0%; height: 100.0%;">         <div style='font-family: Arial; min-width: 200px;'>             <h4 style='margin: 0 0 10px 0; color: #667eea;'>                 ✈️ Corridor #1             </h4>             <table style='width: 100%; border-collapse: collapse;'>                 <tr><td><b>Direction:</b></td><td>68°</td></tr>                 <tr><td><b>Length:</b></td><td>63.9 km</td></tr>                 <tr><td><b>Width:</b></td><td>1.9 km</td></tr>                 <tr><td><b>Flights:</b></td><td>321</td></tr>                 <tr><td><b>Positions:</b></td><td>4776</td></tr>                 <tr><td><b>Avg Altitude:</b></td><td>637 m</td></tr>                 <tr><td><b>Quality:</b></td><td>Fair (0.52)</td></tr>             </table>         </div>         </div>`)[0];
+                popup_1a50d703d072065a53059bc5fbe37bfb.setContent(html_320c31319bc742647f3e947b2039b8cb);
+            
+        
+
+        poly_line_bf38b8b7a8fc2bade6e817841c7eda18.bindPopup(popup_1a50d703d072065a53059bc5fbe37bfb)
+        ;
+
+        
+    
+    
+            poly_line_bf38b8b7a8fc2bade6e817841c7eda18.bindTooltip(
+                `<div>
+                     Corridor #1 (321 flights)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_264ef785e3fb727afc784d2da8a7bae4 = L.polyline(
+                [[52.23443328954896, 12.99498398223827], [52.44721268873913, 13.869596928859197]],
+                {"bubblingMouseEvents": true, "color": "#e74c3c", "dashArray": "5, 5", "dashOffset": null, "fill": false, "fillColor": "#e74c3c", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.4, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(map_8beaa02f5a638db906519f3bdd2e4aaa);
+        
+    
+            var poly_line_4cd345cf943c70ed8f6c88d9ca8afccf = L.polyline(
+                [[52.24254560095213, 12.989615527123357], [52.455325000142196, 13.864202574335343]],
+                {"bubblingMouseEvents": true, "color": "#e74c3c", "dashArray": "5, 5", "dashOffset": null, "fill": false, "fillColor": "#e74c3c", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.4, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(map_8beaa02f5a638db906519f3bdd2e4aaa);
+        
+    
+            var poly_line_40171413931b4d19a0cad1d6361aa8a8 = L.polyline(
+                [[52.41159680561704, 13.3238], [52.284953659875995, 13.7736]],
+                {"bubblingMouseEvents": true, "color": "#f17c15", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f17c15", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.8, "smoothFactor": 1.0, "stroke": true, "weight": 12}
+            ).addTo(map_8beaa02f5a638db906519f3bdd2e4aaa);
+        
+    
+        var popup_0bcf3e69ba94e0a6de02659620ba1d0a = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_840cdd05477969153bd84f312523d704 = $(`<div id="html_840cdd05477969153bd84f312523d704" style="width: 100.0%; height: 100.0%;">         <div style='font-family: Arial; min-width: 200px;'>             <h4 style='margin: 0 0 10px 0; color: #667eea;'>                 ✈️ Corridor #2             </h4>             <table style='width: 100%; border-collapse: collapse;'>                 <tr><td><b>Direction:</b></td><td>115°</td></tr>                 <tr><td><b>Length:</b></td><td>33.6 km</td></tr>                 <tr><td><b>Width:</b></td><td>2.2 km</td></tr>                 <tr><td><b>Flights:</b></td><td>65</td></tr>                 <tr><td><b>Positions:</b></td><td>209</td></tr>                 <tr><td><b>Avg Altitude:</b></td><td>947 m</td></tr>                 <tr><td><b>Quality:</b></td><td>Fair (0.56)</td></tr>             </table>         </div>         </div>`)[0];
+                popup_0bcf3e69ba94e0a6de02659620ba1d0a.setContent(html_840cdd05477969153bd84f312523d704);
+            
+        
+
+        poly_line_40171413931b4d19a0cad1d6361aa8a8.bindPopup(popup_0bcf3e69ba94e0a6de02659620ba1d0a)
+        ;
+
+        
+    
+    
+            poly_line_40171413931b4d19a0cad1d6361aa8a8.bindTooltip(
+                `<div>
+                     Corridor #2 (65 flights)
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var poly_line_323c90c467e274a093250d86cc0e9a7c = L.polyline(
+                [[52.407138264111175, 13.32045894549809], [52.280495118584824, 13.770268501832323]],
+                {"bubblingMouseEvents": true, "color": "#f17c15", "dashArray": "5, 5", "dashOffset": null, "fill": false, "fillColor": "#f17c15", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.4, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(map_8beaa02f5a638db906519f3bdd2e4aaa);
+        
+    
+            var poly_line_4d5686356506963ee9b27343d5920127 = L.polyline(
+                [[52.41605525293331, 13.327141730049123], [52.28941210740704, 13.776932168710797]],
+                {"bubblingMouseEvents": true, "color": "#f17c15", "dashArray": "5, 5", "dashOffset": null, "fill": false, "fillColor": "#f17c15", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.4, "smoothFactor": 1.0, "stroke": true, "weight": 1}
+            ).addTo(map_8beaa02f5a638db906519f3bdd2e4aaa);
+        
+</script>
+</html>
