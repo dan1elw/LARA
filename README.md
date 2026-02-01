@@ -166,4 +166,6 @@ LARA is under active development. Features and APIs may change. Feedback and con
 
 ---
 
+<center>made with ❤️ for aviation enthusiasts and data scientists</center>
+
 <p style="text-align:center;">made with ❤️ for aviation enthusiasts and data scientists</p>
