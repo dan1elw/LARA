@@ -1,0 +1,637 @@
+{
+  "metadata": {
+    "analysis_date": "2026-02-01T12:37:36.757716",
+    "database": "docu/example/lara_flights_berlin.db"
+  },
+  "statistics": {
+    "overview": {
+      "total_flights": 602,
+      "unique_aircraft": 299,
+      "unique_airlines": 91,
+      "total_positions": 23893,
+      "closest_approach": 0.0719481926453144,
+      "avg_altitude": 2838.297346164514,
+      "first_observation": "2026-01-31T11:56:31.211506",
+      "last_observation": "2026-02-01T12:04:17.016333"
+    },
+    "altitude_distribution": [
+      {
+        "class": "very_low",
+        "min_altitude_m": 0,
+        "max_altitude_m": 1000,
+        "count": 5418
+      },
+      {
+        "class": "low",
+        "min_altitude_m": 1000,
+        "max_altitude_m": 3000,
+        "count": 2648
+      },
+      {
+        "class": "medium",
+        "min_altitude_m": 3000,
+        "max_altitude_m": 6000,
+        "count": 831
+      },
+      {
+        "class": "high",
+        "min_altitude_m": 6000,
+        "max_altitude_m": 9000,
+        "count": 84
+      },
+      {
+        "class": "very_high",
+        "min_altitude_m": 9000,
+        "max_altitude_m": 12000,
+        "count": 1717
+      },
+      {
+        "class": "cruise",
+        "min_altitude_m": 12000,
+        "max_altitude_m": null,
+        "count": 109
+      }
+    ],
+    "distance_distribution": [
+      {
+        "class": "very_close",
+        "min_distance_km": 0,
+        "max_distance_km": 5,
+        "count": 168
+      },
+      {
+        "class": "close",
+        "min_distance_km": 5,
+        "max_distance_km": 10,
+        "count": 742
+      },
+      {
+        "class": "medium",
+        "min_distance_km": 10,
+        "max_distance_km": 20,
+        "count": 16575
+      },
+      {
+        "class": "far",
+        "min_distance_km": 20,
+        "max_distance_km": 30,
+        "count": 4900
+      },
+      {
+        "class": "very_far",
+        "min_distance_km": 30,
+        "max_distance_km": null,
+        "count": 1508
+      }
+    ],
+    "hourly_pattern": [
+      {
+        "hour": 0,
+        "flight_count": 6,
+        "avg_distance": 18.41901357662589,
+        "avg_altitude": 6149.34
+      },
+      {
+        "hour": 1,
+        "flight_count": 6,
+        "avg_distance": 17.337077325335688,
+        "avg_altitude": 449.58
+      },
+      {
+        "hour": 2,
+        "flight_count": 4,
+        "avg_distance": 18.462046465793353,
+        "avg_altitude": null
+      },
+      {
+        "hour": 8,
+        "flight_count": 12,
+        "avg_distance": 17.101598795282886,
+        "avg_altitude": 4954.905
+      },
+      {
+        "hour": 9,
+        "flight_count": 42,
+        "avg_distance": 16.57945784479679,
+        "avg_altitude": 4741.606451612903
+      },
+      {
+        "hour": 10,
+        "flight_count": 40,
+        "avg_distance": 18.44554088529754,
+        "avg_altitude": 4410.363636363638
+      },
+      {
+        "hour": 11,
+        "flight_count": 69,
+        "avg_distance": 18.233186398731934,
+        "avg_altitude": 3794.760000000001
+      },
+      {
+        "hour": 12,
+        "flight_count": 55,
+        "avg_distance": 16.498397003667062,
+        "avg_altitude": 4431.680487804877
+      },
+      {
+        "hour": 13,
+        "flight_count": 49,
+        "avg_distance": 17.506594076304463,
+        "avg_altitude": 5174.887142857142
+      },
+      {
+        "hour": 14,
+        "flight_count": 47,
+        "avg_distance": 17.318065591314316,
+        "avg_altitude": 5146.795135135135
+      },
+      {
+        "hour": 15,
+        "flight_count": 53,
+        "avg_distance": 16.284064634130704,
+        "avg_altitude": 5238.940499999999
+      },
+      {
+        "hour": 16,
+        "flight_count": 28,
+        "avg_distance": 17.670501428414575,
+        "avg_altitude": 3382.899
+      },
+      {
+        "hour": 17,
+        "flight_count": 49,
+        "avg_distance": 16.073467650161813,
+        "avg_altitude": 5334.870857142856
+      },
+      {
+        "hour": 18,
+        "flight_count": 23,
+        "avg_distance": 16.98300061440099,
+        "avg_altitude": 5350.844210526316
+      },
+      {
+        "hour": 19,
+        "flight_count": 30,
+        "avg_distance": 17.98923560411783,
+        "avg_altitude": 4351.655
+      },
+      {
+        "hour": 20,
+        "flight_count": 29,
+        "avg_distance": 16.966603338927708,
+        "avg_altitude": 4919.749090909091
+      },
+      {
+        "hour": 21,
+        "flight_count": 25,
+        "avg_distance": 16.597750022001136,
+        "avg_altitude": 4346.170909090908
+      },
+      {
+        "hour": 22,
+        "flight_count": 24,
+        "avg_distance": 16.000436336945118,
+        "avg_altitude": 2704.7686956521734
+      },
+      {
+        "hour": 23,
+        "flight_count": 11,
+        "avg_distance": 18.575767828513687,
+        "avg_altitude": 2343.9119999999994
+      }
+    ],
+    "weekday_pattern": [
+      {
+        "weekday": "Sunday",
+        "flight_count": 164
+      },
+      {
+        "weekday": "Saturday",
+        "flight_count": 438
+      }
+    ]
+  },
+  "corridors": {
+    "total_corridors": 2,
+    "corridors": [
+      {
+        "rank": 1,
+        "center_lat": 52.34487917540278,
+        "center_lon": 13.4296,
+        "heading": 67.93975139033358,
+        "length_km": 63.9487241767678,
+        "width_km": 1.9466080286114584,
+        "unique_flights": 321,
+        "total_positions": 4776,
+        "avg_altitude_m": 637.1832270478322,
+        "linearity_score": 0.5228812493806634,
+        "start_lat": 52.23848947569041,
+        "start_lon": 12.9923,
+        "end_lat": 52.45126887511515,
+        "end_lon": 13.8669,
+        "avg_heading": 67.93975139033358
+      },
+      {
+        "rank": 2,
+        "center_lat": 52.348275232746516,
+        "center_lon": 13.5487,
+        "heading": 114.56748559261297,
+        "length_km": 33.64153027642395,
+        "width_km": 2.1804381147258414,
+        "unique_flights": 65,
+        "total_positions": 209,
+        "avg_altitude_m": 947.1991304347827,
+        "linearity_score": 0.559423852595262,
+        "start_lat": 52.41159680561704,
+        "start_lon": 13.3238,
+        "end_lat": 52.284953659875995,
+        "end_lon": 13.7736,
+        "avg_heading": 114.56748559261297
+      }
+    ],
+    "parameters": {
+      "min_flights": 60,
+      "heading_tolerance": 20.0,
+      "proximity_km": 10.0,
+      "min_linearity": 0.3,
+      "min_length_km": 3.0
+    }
+  },
+  "patterns": {
+    "recurring_flights": [
+      {
+        "callsign": "UNKNOWN",
+        "occurrences": 123,
+        "avg_min_distance_km": 18.659342843372627,
+        "avg_altitude_m": 82.6476923076923,
+        "first_seen": "2026-01-31T11:58:52.758162",
+        "last_seen": "2026-02-01T11:53:00.133923"
+      },
+      {
+        "callsign": "CHX100",
+        "occurrences": 8,
+        "avg_min_distance_km": 11.516928774050644,
+        "avg_altitude_m": 282.8925,
+        "first_seen": "2026-01-31T11:56:31.211506",
+        "last_seen": "2026-02-01T10:15:52.161615"
+      },
+      {
+        "callsign": "CHX31",
+        "occurrences": 8,
+        "avg_min_distance_km": 9.169036511564336,
+        "avg_altitude_m": 262.89,
+        "first_seen": "2026-01-31T11:56:31.211506",
+        "last_seen": "2026-02-01T12:04:17.016333"
+      },
+      {
+        "callsign": "CHX82",
+        "occurrences": 8,
+        "avg_min_distance_km": 7.228544250849765,
+        "avg_altitude_m": 332.42249999999996,
+        "first_seen": "2026-01-31T11:56:46.897800",
+        "last_seen": "2026-02-01T11:20:33.186301"
+      },
+      {
+        "callsign": "S264",
+        "occurrences": 7,
+        "avg_min_distance_km": 18.651294198843345,
+        "avg_altitude_m": null,
+        "first_seen": "2026-01-31T12:28:54.341078",
+        "last_seen": "2026-02-01T11:16:11.375181"
+      },
+      {
+        "callsign": "G958",
+        "occurrences": 5,
+        "avg_min_distance_km": 18.804077296367904,
+        "avg_altitude_m": null,
+        "first_seen": "2026-01-31T14:04:00.307644",
+        "last_seen": "2026-02-01T12:04:17.016333"
+      }
+    ],
+    "schedules": [
+      {
+        "callsign": "UNKNOWN",
+        "hour": 12,
+        "frequency": 15
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 15,
+        "frequency": 12
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 17,
+        "frequency": 12
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 9,
+        "frequency": 11
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 11,
+        "frequency": 11
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 14,
+        "frequency": 9
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 13,
+        "frequency": 8
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 10,
+        "frequency": 7
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 20,
+        "frequency": 6
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 16,
+        "frequency": 5
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 18,
+        "frequency": 5
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 19,
+        "frequency": 5
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 1,
+        "frequency": 4
+      },
+      {
+        "callsign": "UNKNOWN",
+        "hour": 23,
+        "frequency": 4
+      }
+    ],
+    "route_variations": {
+      "high_variation_routes": [
+        {
+          "callsign": "CHX100",
+          "flights": 8,
+          "avg_distance_km": 11.516928774050644,
+          "variation_km": 12.618343714001577
+        },
+        {
+          "callsign": "CHX82",
+          "flights": 8,
+          "avg_distance_km": 7.228544250849765,
+          "variation_km": 11.33506847807271
+        },
+        {
+          "callsign": "UNKNOWN",
+          "flights": 123,
+          "avg_distance_km": 18.659342843372627,
+          "variation_km": 10.761061006370825
+        }
+      ],
+      "count": 3
+    }
+  },
+  "temporal": {
+    "days_analyzed": 30,
+    "daily_trends": [
+      {
+        "date": "2026-01-31",
+        "flight_count": 438,
+        "avg_distance": 16.94340500701776
+      },
+      {
+        "date": "2026-02-01",
+        "flight_count": 164,
+        "avg_distance": 17.773536013288396
+      }
+    ],
+    "avg_daily_flights": 301.0
+  },
+  "airlines": {
+    "top_airlines": [
+      {
+        "airline_code": "UNK",
+        "flight_count": 123,
+        "avg_min_distance": 18.659342843372627,
+        "avg_altitude": 82.6476923076923,
+        "closest_approach": 9.178015254960103
+      },
+      {
+        "airline_code": "RYR",
+        "flight_count": 66,
+        "avg_min_distance": 14.724165942820374,
+        "avg_altitude": 6312.759692307695,
+        "closest_approach": 0.5652017845459584
+      },
+      {
+        "airline_code": "DLH",
+        "flight_count": 48,
+        "avg_min_distance": 16.35499069037177,
+        "avg_altitude": 4681.22,
+        "closest_approach": 2.163368147928877
+      },
+      {
+        "airline_code": "CHX",
+        "flight_count": 24,
+        "avg_min_distance": 9.304836512154916,
+        "avg_altitude": 292.73499999999996,
+        "closest_approach": 1.4835116052416994
+      },
+      {
+        "airline_code": "EJU",
+        "flight_count": 23,
+        "avg_min_distance": 20.149325797021476,
+        "avg_altitude": 2655.7356521739125,
+        "closest_approach": 14.234249703534488
+      },
+      {
+        "airline_code": "EWG",
+        "flight_count": 20,
+        "avg_min_distance": 19.18952522471939,
+        "avg_altitude": 2286.7619999999997,
+        "closest_approach": 14.981551497644165
+      },
+      {
+        "airline_code": "SAS",
+        "flight_count": 18,
+        "avg_min_distance": 16.233510335616053,
+        "avg_altitude": 8078.469999999999,
+        "closest_approach": 3.2687749908250856
+      },
+      {
+        "airline_code": "KLM",
+        "flight_count": 17,
+        "avg_min_distance": 15.003225555046187,
+        "avg_altitude": 6220.777499999999,
+        "closest_approach": 0.9844372741777725
+      },
+      {
+        "airline_code": "LOT",
+        "flight_count": 15,
+        "avg_min_distance": 16.063190721603664,
+        "avg_altitude": 8538.464,
+        "closest_approach": 0.8659629720786958
+      },
+      {
+        "airline_code": "THY",
+        "flight_count": 14,
+        "avg_min_distance": 19.04341024024114,
+        "avg_altitude": 4539.761538461538,
+        "closest_approach": 8.127712988087271
+      },
+      {
+        "airline_code": "BAW",
+        "flight_count": 12,
+        "avg_min_distance": 18.233701570828202,
+        "avg_altitude": 4826.000000000001,
+        "closest_approach": 4.624328365453166
+      },
+      {
+        "airline_code": "CFG",
+        "flight_count": 11,
+        "avg_min_distance": 19.1086578999809,
+        "avg_altitude": 2019.3,
+        "closest_approach": 18.045671451632636
+      },
+      {
+        "airline_code": "AUA",
+        "flight_count": 11,
+        "avg_min_distance": 16.66366838073584,
+        "avg_altitude": 5207.923636363636,
+        "closest_approach": 2.018870237111019
+      },
+      {
+        "airline_code": "PGT",
+        "flight_count": 9,
+        "avg_min_distance": 20.879751484972743,
+        "avg_altitude": 2915.6025,
+        "closest_approach": 19.11800636082053
+      },
+      {
+        "airline_code": "SWR",
+        "flight_count": 8,
+        "avg_min_distance": 18.624429000066744,
+        "avg_altitude": 2392.6800000000003,
+        "closest_approach": 13.975439744283172
+      },
+      {
+        "airline_code": "FIN",
+        "flight_count": 8,
+        "avg_min_distance": 14.943753406166163,
+        "avg_altitude": 6227.445000000001,
+        "closest_approach": 2.9890148936160443
+      },
+      {
+        "airline_code": "S26",
+        "flight_count": 7,
+        "avg_min_distance": 18.651294198843345,
+        "avg_altitude": null,
+        "closest_approach": 17.942205163866728
+      },
+      {
+        "airline_code": "AFR",
+        "flight_count": 7,
+        "avg_min_distance": 19.330161138971764,
+        "avg_altitude": 2397.76,
+        "closest_approach": 18.03995243973291
+      },
+      {
+        "airline_code": "QTR",
+        "flight_count": 6,
+        "avg_min_distance": 17.99159236845786,
+        "avg_altitude": 3412.236,
+        "closest_approach": 9.721129562932534
+      },
+      {
+        "airline_code": "NSZ",
+        "flight_count": 6,
+        "avg_min_distance": 21.41228981726415,
+        "avg_altitude": 9249.41,
+        "closest_approach": 8.302812562012752
+      },
+      {
+        "airline_code": "IBS",
+        "flight_count": 6,
+        "avg_min_distance": 19.566337956622615,
+        "avg_altitude": 1977.39,
+        "closest_approach": 19.162762480887757
+      },
+      {
+        "airline_code": "BEL",
+        "flight_count": 6,
+        "avg_min_distance": 19.073944598841276,
+        "avg_altitude": 4046.22,
+        "closest_approach": 17.197975337925662
+      },
+      {
+        "airline_code": "AWH",
+        "flight_count": 6,
+        "avg_min_distance": 15.817285494993174,
+        "avg_altitude": 7449.82,
+        "closest_approach": 8.277407706653202
+      },
+      {
+        "airline_code": "G95",
+        "flight_count": 5,
+        "avg_min_distance": 18.804077296367904,
+        "avg_altitude": null,
+        "closest_approach": 18.70255925402606
+      },
+      {
+        "airline_code": "WMT",
+        "flight_count": 4,
+        "avg_min_distance": 18.045854829284345,
+        "avg_altitude": 1884.045,
+        "closest_approach": 18.033789354511416
+      },
+      {
+        "airline_code": "VLG",
+        "flight_count": 4,
+        "avg_min_distance": 11.138865439875946,
+        "avg_altitude": 3421.38,
+        "closest_approach": 1.4397385941597096
+      },
+      {
+        "airline_code": "TAP",
+        "flight_count": 4,
+        "avg_min_distance": 19.546178325163545,
+        "avg_altitude": 1682.1150000000002,
+        "closest_approach": 19.103795436269344
+      },
+      {
+        "airline_code": "SXS",
+        "flight_count": 4,
+        "avg_min_distance": 19.856657973103736,
+        "avg_altitude": 1731.645,
+        "closest_approach": 19.589172503223075
+      },
+      {
+        "airline_code": "NJE",
+        "flight_count": 4,
+        "avg_min_distance": 10.002076830743219,
+        "avg_altitude": 7717.154999999999,
+        "closest_approach": 4.976489460505936
+      },
+      {
+        "airline_code": "CTN",
+        "flight_count": 4,
+        "avg_min_distance": 16.934593930639437,
+        "avg_altitude": 6488.43,
+        "closest_approach": 3.726740936147029
+      }
+    ]
+  }
+}

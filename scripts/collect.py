@@ -53,4 +53,6 @@ def main():
 
 
 if __name__ == "__main__":
+    # Collect data with given config
+    sys.argv = ["scripts/collect.py", "--config", "docu/example/config.yaml"]
     main()

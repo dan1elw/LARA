@@ -14,14 +14,20 @@ from datetime import datetime
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from lara.tracking import Config
+from lara.config import Config
 from lara.analysis import FlightAnalyzer
 
 
-def main(config_path: str = "data/config.yaml"):
+def main():
     """Main entry point for analyzer."""
     parser = argparse.ArgumentParser(
         description="LARA Flight Data Analyzer - Advanced pattern analysis"
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default="data/config.yaml",
+        help="Path to config file (default: data/config.yaml)",
     )
     parser.add_argument(
         "--db", type=str, help="Path to database file (default: from config.yaml)"
@@ -58,7 +64,7 @@ def main(config_path: str = "data/config.yaml"):
     if args.db:
         db_path = args.db
     else:
-        config = Config(config_path)
+        config = Config(args.config)
         db_path = config.db_path
 
     # Create output filename
@@ -105,4 +111,12 @@ def main(config_path: str = "data/config.yaml"):
 
 
 if __name__ == "__main__":
+    # Analyze Example data
+    sys.argv = [
+        "scripts/analyze.py",
+        "--config",
+        "docu/example/config.yaml",
+        "--output",
+        "docu/example/lara_analysis_berlin.json",
+    ]
     main()

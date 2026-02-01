@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LARA Dashboard</title>
+    <link rel="icon" href="../docu/icon.ico">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 3em;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .card {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+        }
+        .card h2 {
+            margin: 0 0 15px 0;
+            color: #667eea;
+            font-size: 1.5em;
+        }
+        .card p {
+            margin: 0;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        .card .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #764ba2;
+        }
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.6;
+            margin-top: 60px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛩️ LARA Dashboard</h1>
+        <p>Local Air Route Analysis</p>
+    </div>
+    
+    <div class="container">
+        <div class="grid">
+            <div class="card" onclick="window.location='corridors.html'">
+                <div class="icon">🗺️</div>
+                <h2>Flight Corridors</h2>
+                <p>Visualize the most common flight paths and corridors over your location. Sized by traffic volume.</p>
+                <a href="corridors.html" class="btn">View Map</a>
+            </div>
+            
+            <div class="card" onclick="window.location='traffic_heatmap.html'">
+                <div class="icon">🔥</div>
+                <h2>Traffic Heatmap</h2>
+                <p>Density heatmap showing areas with highest flight activity. Darker areas indicate more traffic.</p>
+                <a href="traffic_heatmap.html" class="btn">View Heatmap</a>
+            </div>
+            
+            <div class="card" onclick="window.location='altitude_heatmap.html'">
+                <div class="icon">📊</div>
+                <h2>Altitude Analysis</h2>
+                <p>Heatmap weighted by altitude. Shows where aircraft fly lowest (potential noise impact).</p>
+                <a href="altitude_heatmap.html" class="btn">View Analysis</a>
+            </div>
+
+            <div class="card" onclick="window.location='recent_flights_24h.html'">
+                <div class="icon">✈️</div>
+                <h2>Recent Flights (24h)</h2>
+                <p>All flights detected in the last 24 hours with complete flight paths and position data.</p>
+                <a href="recent_flights_24h.html" class="btn">View Flights</a>
+            </div>
+
+            <div class="card" onclick="window.location='live_view.html'">
+                <div class="icon">🔴</div>
+                <h2>Live View</h2>
+                <p>Real-time flight tracking and visualization.</p>
+                <a href="live_view.html" class="btn">View Live</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>LARA - Local Air Route Analysis<br>
+        Data visualization powered by Folium & OpenStreetMap</p>
+    </div>
+</body>
+</html>

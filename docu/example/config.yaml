@@ -1,0 +1,16 @@
+# LARA Configuration File
+
+location:
+  latitude: 52.516257
+  longitude: 13.377525
+  name: "Berlin Brandenburger Tor, Germany"
+
+tracking:
+  radius_km: 35
+  update_interval_seconds: 15
+  
+database:
+  path: "docu/example/lara_flights_berlin.db"
+  
+api:
+  credentials_path: "credentials.json"
