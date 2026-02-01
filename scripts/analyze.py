@@ -114,9 +114,5 @@ if __name__ == "__main__":
     # Analyze Example data
     sys.argv = [
         "scripts/analyze.py",
-        "--config",
-        "docu/example/config.yaml",
-        "--output",
-        "docu/example/lara_analysis_berlin.json",
     ]
     main()

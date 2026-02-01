@@ -252,9 +252,5 @@ if __name__ == "__main__":
     sys.argv = [
         "scripts/visualize.py",
         "--dashboard",
-        "--config",
-        "docu/example/config.yaml",
-        "--output-dir",
-        "docu/example/html/",
     ]
     main()
