@@ -139,6 +139,7 @@ Detailed documentation is available in the `docs/` directory:
 - [Configuration Options](docu/lara_configuration.md)
 - [Usage Examples](docu/lara_example.md)
 - [Database Schema](docu/lara_database_schema.md)
+- [OpenSky API Documentation](docu/lara_opensky_api.md)
 
 ---
 
